@@ -1,0 +1,6 @@
+/application/configuration/config.ini
+/application/configuration/install.sql
+/public/uploads/
+/temp/cache/
+/application/logs/
+/nbproject/

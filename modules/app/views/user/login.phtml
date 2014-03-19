@@ -1,0 +1,25 @@
+
+
+<article id="chat">
+    <div class="info">
+        Vítejte na online chatu.<br/>
+        Vyplňte následující informace
+    </div>
+    <div class="chatContent">
+        <form action="#" method="post">
+              {if isset($errors["email"])}
+            <span class="error">
+                {echo join("<br/>", $errors["email"])}
+            </span>
+              {/if}
+            <table class="login">
+                <tr><td><label for="name">Jméno</label> <br/><input class="chatTextInput" type="text" name="firstname" required maxlength="30"/><br/></td></tr>
+                <tr><td><label for="email">Příjmení</label><br/><input class="chatTextInput" type="text" name="lastname" required maxlength="30" /></td></tr>
+                <tr><td><label for="email">Email</label><br/><input class="chatTextInput" type="email" name="email" required maxlength="60" /></td></tr>
+            </table>
+            <div class="buttonWrapper">
+                <input class="chatButton" type="submit" name="continue" value="Pokračovat"/>    
+            </div>
+        </form>
+    </div>
+</article>
