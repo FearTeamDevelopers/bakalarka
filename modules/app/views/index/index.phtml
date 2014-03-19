@@ -1,0 +1,24 @@
+<div class="logout">
+    <a href="/logout">X</a>
+</div>
+<div class="info">
+    Online Chat
+</div>
+<div class="chatContent">
+    {script $i = 0}
+    {foreach $bla in $queue}
+    {script $i++}
+    {/foreach}
+    {if $i<>1}
+    Jste {echo $i}. v pořadí
+    počkejte pár dní než předchozí uchazeč ukončí konverzaci.
+    </div>
+    {/if}
+    {if $i<2}
+    
+    </div>
+    <form method="post" action="#">
+    <input type='text' name='chatTextInput' class='chatTextInput'/>
+    <input type="submit" name="chatTextSubmit" class="chatTextSubmit" value="odeslat"/>
+    </form>
+    {/if}
