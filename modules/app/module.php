@@ -14,6 +14,8 @@ class App_Module extends Module{
      */
     protected $_moduleName = "App";
     
+    protected $_testVariable;
+    
     protected $_routes = array(
         array(
             'pattern' => '/login',
