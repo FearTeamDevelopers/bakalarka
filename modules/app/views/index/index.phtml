@@ -18,6 +18,12 @@
     
     </div>
     <form method="post" action="#">
+          {if isset($errors["chatErrors"])}
+            <span class="error">
+                {echo join("<br/>", $errors["chatErrors"])}
+            </span>
+            {/if}
+            <br/>
     <input type='text' name='chatTextInput' class='chatTextInput'/>
     <input type="submit" name="chatTextSubmit" class="chatTextSubmit" value="odeslat"/>
     </form>

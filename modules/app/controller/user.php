@@ -82,7 +82,7 @@ class App_Controller_User extends Controller {
 
                 $user->save();
                 
-                $session = $user;
+                $session->set("user",$user) ;
                 
             $queue = new App_Model_Queue(array(
                 "idAdmin" => 1,
