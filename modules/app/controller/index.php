@@ -29,13 +29,12 @@ class App_Controller_Index extends Controller {
             * post mi ho nebere, dunno why
             * *************/
             $message = RequestMethods::post('chatTextInput');
-            print_r($message);die;
             
             if(empty($message)){
                 $errors['chatErrors'] = array("nemůžete odeslat prázdnou zprávu");
                 $view->set('errors',$errors);
             }else{
-                print_r("bla");die;
+                print_r("bla");die();
                 $konverzace = new App_Model_Konverzace(array(
                    "from" =>$userId,
                     "to" => 1,
