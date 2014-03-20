@@ -1,0 +1,75 @@
+<article>
+    <h1>Kecárna</h1>
+
+    {if isset($messages)}
+    {foreach $message in $messages}
+    <article class="messageWrapper relative">
+        <div class="message">
+            <span class="title">{echo $message->title}</span><br/>
+            <p class="messageBody">{echo nl2br($message->body)}</p>
+            <span class="meta">Autor: {echo $message->author} </span>
+            <span class="meta">Vytvořeno: {echo date("d.m. Y H:i", strtotime($message->created))} </span><br/>
+        </div>
+        <div class="clear"></div>
+
+        {script $replies = App_ChatModel::fetchReplies($message->id)}
+        {foreach $reply in $replies}
+        <div class="reply">
+            <span class="title">{echo $reply->title}</span><br />
+            <p class="messageBody">{echo nl2br($reply->body)}</p>
+            <span class="meta">Autor: {echo $reply->author} </span>
+            <span class="meta">Vytvořeno: {echo date("d.m. Y H:i", strtotime($reply->created))}</span>
+        </div>
+        <div class="clear"></div>
+
+        {/foreach}
+
+        <a href="#" class="showReplyForm">Reply</a>
+        <div class="replyForm">
+            <form method="post" action="#" class="stdform">
+                <input type="hidden" value="{echo $message->id}" name="reply" />
+                <p>
+                    <label>Title</label>
+                    <span class="field">
+                        <input type="text" name="title" class="mediuminput" value="RE {echo $message->title}"/>
+                    </span>
+                </p>
+                <p>
+                    <label>Text</label>
+                    <span class="field">
+                        <textarea name="body" class="mediuminput" rows="5"></textarea>
+                    </span>
+                </p>
+                <p>
+                    <label></label>
+                    <span class="field">
+                        <input type="submit" name="sendMessage" value="Send Reply" />
+                    </span>
+                </p>
+            </form>
+        </div>
+    </article>
+    {/foreach}
+    {/if}
+
+    <form method="post" action="#" class="stdform">
+        <p>
+            <label>Title</label>
+            <span class="field">
+                <input type="text" name="title" class="mediuminput"/>
+            </span>
+        </p>
+        <p>
+            <label>Text</label>
+            <span class="field">
+                <textarea name="body" class="mediuminput" rows="5"></textarea>
+            </span>
+        </p>
+        <p>
+            <label></label>
+            <span class="field">
+                <input type="submit" name="sendMessage" value="Send" />
+            </span>
+        </p>
+    </form>
+</article>
