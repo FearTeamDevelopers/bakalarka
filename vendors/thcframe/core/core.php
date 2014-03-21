@@ -79,6 +79,22 @@ class Core
 
     /**
      * 
+     * @param type $message
+     * @param type $file
+     */
+    public static function log($message, $file = null)
+    {
+        $messageE = "[".date("Y-m-d H:i:s", time())."] DEBUG: ".$message.PHP_EOL;
+        
+        if(NULL !== $file){
+            file_put_contents(APP_PATH. "/application/logs/".$file, $messageE, FILE_APPEND);
+        }else{
+            file_put_contents(APP_PATH. "/application/logs/system.log", $messageE, FILE_APPEND);
+        }
+    }
+
+    /**
+     * 
      * @return type
      * @throws Exception
      */
@@ -117,7 +133,7 @@ class Core
 
         $arrev = array_reverse($arr);
         $count = count($arrev);
-        for ($i = 8; $i < $count; $i++) {
+        for ($i = 10; $i < $count; $i++) {
             unlink($arrev[$i]);
         }
 

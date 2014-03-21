@@ -42,12 +42,12 @@ class Query extends Base
     /**
      * @read
      */
-    protected $_order;
+    protected $_order = array();
 
     /**
      * @read
      */
-    protected $_direction;
+    protected $_groupby;
 
     /**
      * @read
@@ -58,6 +58,16 @@ class Query extends Base
      * @read
      */
     protected $_where = array();
+
+    /**
+     * @read
+     */
+    protected $_orwhere = array();
+
+    /**
+     * @read
+     */
+    protected $_having = array();
 
     /**
      * 
@@ -114,7 +124,7 @@ class Query extends Base
     {
         $fields = array();
         $where = $order = $limit = $join = "";
-        $template = "SELECT %s FROM %s %s %s %s %s";
+        $template = "SELECT %s FROM %s %s %s %s %s %s %s";
 
         foreach ($this->fields as $table => $_fields) {
             foreach ($_fields as $field => $alias) {
@@ -126,7 +136,7 @@ class Query extends Base
             }
         }
 
-        $fields = join(", ", $fields);
+        $joinedFields = join(", ", $fields);
 
         $_join = $this->join;
         if (!empty($_join)) {
@@ -134,15 +144,36 @@ class Query extends Base
         }
 
         $_where = $this->where;
+        $_orwhere = $this->orwhere;
+        $joinedWhere = '';
         if (!empty($_where)) {
-            $joined = join(" AND ", $_where);
-            $where = "WHERE {$joined}";
+            $joinedWhere .= join(" AND ", $_where);
+        }
+
+        if (!empty($_orwhere)) {
+            $joinedWhere .= join(" OR ", $_orwhere);
+        }
+
+        if ($joinedWhere != '') {
+            $where = "WHERE {$joinedWhere}";
+        }
+
+        $_groupBy = $this->groupby;
+        $groupBy = $having = '';
+        if (!empty($_groupBy)) {
+            $groupBy = "GROUP BY {$_groupBy}";
+
+            $_having = $this->having;
+            if (!empty($_having)) {
+                $joinedHaving = join(" AND ", $_having);
+                $having = "HAVING {$joinedHaving}";
+            }
         }
 
         $_order = $this->order;
         if (!empty($_order)) {
-            $_direction = $this->direction;
-            $order = "ORDER BY {$_order} {$_direction}";
+            $joindeOrder = join(", ", $_order);
+            $order = "ORDER BY {$joindeOrder}";
         }
 
         $_limit = $this->limit;
@@ -156,7 +187,7 @@ class Query extends Base
             }
         }
 
-        return sprintf($template, $fields, $this->from, $join, $where, $order, $limit);
+        return sprintf($template, $joinedFields, $this->from, $join, $where, $groupBy, $having, $order, $limit);
     }
 
     /**
@@ -333,7 +364,7 @@ class Query extends Base
      * @return \THCFrame\Database\Query
      * @throws Exception\Argument
      */
-    public function join($join, $on, $fields = array())
+    public function join($join, $on, $alias = null, $fields = array())
     {
         if (empty($join)) {
             throw new Exception\Argument("Invalid argument");
@@ -343,8 +374,13 @@ class Query extends Base
             throw new Exception\Argument("Invalid argument");
         }
 
-        $this->_fields += array($join => $fields);
-        $this->_join[] = "JOIN {$join} ON {$on}";
+        if (NULL !== $alias) {
+            $this->_fields += array($alias => $fields);
+            $this->_join[] = "JOIN {$join} {$alias} ON {$on}";
+        } else {
+            $this->_fields += array($join => $fields);
+            $this->_join[] = "JOIN {$join} ON {$on}";
+        }
 
         return $this;
     }
@@ -386,8 +422,7 @@ class Query extends Base
             throw new Exception\Argument("Invalid argument");
         }
 
-        $this->_order = $order;
-        $this->_direction = $direction;
+        $this->_order[] = $order . " " . $direction;
 
         return $this;
     }
@@ -412,6 +447,71 @@ class Query extends Base
         }
 
         $this->_where[] = call_user_func_array("sprintf", $arguments);
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @return \THCFrame\Database\Query
+     * @throws Exception\Argument
+     */
+    public function orwhere()
+    {
+        $arguments = func_get_args();
+
+        if (count($arguments) < 1) {
+            throw new Exception\Argument("Invalid argument");
+        }
+
+        $arguments[0] = preg_replace("#\?#", "%s", $arguments[0]);
+
+        foreach (array_slice($arguments, 1, null, true) as $i => $parameter) {
+            $arguments[$i] = $this->_quote($arguments[$i]);
+        }
+
+        $this->_orwhere[] = call_user_func_array("sprintf", $arguments);
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @return \THCFrame\Database\Query
+     * @throws Exception\Argument
+     */
+    public function having()
+    {
+        $arguments = func_get_args();
+
+        if (count($arguments) < 1) {
+            throw new Exception\Argument("Invalid argument");
+        }
+
+        $arguments[0] = preg_replace("#\?#", "%s", $arguments[0]);
+
+        foreach (array_slice($arguments, 1, null, true) as $i => $parameter) {
+            $arguments[$i] = $this->_quote($arguments[$i]);
+        }
+
+        $this->_having[] = call_user_func_array("sprintf", $arguments);
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @param type $field
+     * @return \THCFrame\Database\Query
+     * @throws Exception\Argument
+     */
+    public function groupby($field)
+    {
+        if (empty($field)) {
+            throw new Exception\Argument("Invalid argument");
+        }
+
+        $this->_groupby = $field;
 
         return $this;
     }
@@ -468,6 +568,16 @@ class Query extends Base
         }
 
         return $row["rows"];
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    public function assemble()
+    {
+        $sql = $this->_buildSelect();
+        return (string) $sql;
     }
 
 }

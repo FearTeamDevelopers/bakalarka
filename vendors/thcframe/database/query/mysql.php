@@ -26,7 +26,12 @@ class Mysql extends Database\Query
 
         if ($result === false) {
             $error = $this->connector->lastError;
-            throw new Exception\Sql(sprintf("There was an error with your SQL query: %s", $error));
+
+            if (DEBUG) {
+                throw new Exception\Sql(sprintf("There was an error with your SQL query: %s", $error));
+            } else {
+                throw new Exception\Sql("There was an error with your SQL query");
+            }
         }
 
         $rows = array();

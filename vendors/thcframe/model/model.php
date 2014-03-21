@@ -88,7 +88,7 @@ class Model extends Base
             "message" => "The {0} field must contain valid time (hh:mm / hh:mm:ss)"
         )
     );
-
+   
     /**
      * @read
      */
@@ -245,20 +245,20 @@ class Model extends Base
      */
     protected function _validateDate($value)
     {
-        $format = 'yyyy-mm-dd';
+        $format = "yyyy-mm-dd";
 
         if (strlen($value) >= 6 && strlen($format) == 10) {
 
-            $separator_only = str_replace(array('m', 'd', 'y'), '', $format);
+            $separator_only = str_replace(array("m", "d", "y"), "", $format);
             $separator = $separator_only[0]; // separator is first character 
 
             if ($separator && strlen($separator_only) == 2) {
-                $regexp = str_replace('mm', '(0?[1-9]|1[0-2])', $format);
-                $regexp = str_replace('dd', '(0?[1-9]|[1-2][0-9]|3[0-1])', $regexp);
-                $regexp = str_replace('yyyy', '(19|20)?[0-9][0-9]', $regexp);
+                $regexp = str_replace("mm", "(0?[1-9]|1[0-2])", $format);
+                $regexp = str_replace("dd", "(0?[1-9]|[1-2][0-9]|3[0-1])", $regexp);
+                $regexp = str_replace("yyyy", "(19|20)?[0-9][0-9]", $regexp);
                 //$regexp = str_replace($separator, "\\" . $separator, $regexp);
 
-                if ($regexp != $value && preg_match('/' . $regexp . '\z/', $value)) {
+                if ($regexp != $value && preg_match("/" . $regexp . "\z/", $value)) {
                     $arr = explode($separator, $value);
                     $day = $arr[2];
                     $month = $arr[1];
@@ -436,7 +436,7 @@ class Model extends Base
         if (empty($this->_table)) {
             list($module, $type, $name) = explode("_", get_class($this));
 
-            if(strtolower($type) == "model" && !empty($name)){
+            if (strtolower($type) == "model" && !empty($name)) {
                 $this->_table = strtolower("tb_{$name}");
             }
         }
@@ -583,10 +583,10 @@ class Model extends Base
      * @param type $direction
      * @return type
      */
-    public static function first($where = array(), $fields = array("*"), $order = null, $direction = null)
+    public static function first($where = array(), $fields = array("*"), $order = array())
     {
         $model = new static();
-        return $model->_first($where, $fields, $order, $direction);
+        return $model->_first($where, $fields, $order);
     }
 
     /**
@@ -597,7 +597,7 @@ class Model extends Base
      * @param type $direction
      * @return \THCFrame\class|null
      */
-    protected function _first($where = array(), $fields = array("*"), $order = null, $direction = null)
+    protected function _first($where = array(), $fields = array("*"), $order = array())
     {
         $query = $this->connector
                 ->query()
@@ -607,8 +607,10 @@ class Model extends Base
             $query->where($clause, $value);
         }
 
-        if ($order != null) {
-            $query->order($order, $direction);
+        if (!empty($order)) {
+            foreach ($order as $filed => $direction) {
+                $query->order($filed, $direction);
+            }
         }
 
         $first = $query->first();
@@ -631,10 +633,10 @@ class Model extends Base
      * @param type $page
      * @return type
      */
-    public static function all($where = array(), $fields = array("*"), $order = null, $direction = null, $limit = null, $page = null)
+    public static function all($where = array(), $fields = array("*"), $order = array(), $limit = null, $page = null, $group = null, $having = array())
     {
         $model = new static();
-        return $model->_all($where, $fields, $order, $direction, $limit, $page);
+        return $model->_all($where, $fields, $order, $limit, $page, $group, $having);
     }
 
     /**
@@ -647,7 +649,7 @@ class Model extends Base
      * @param type $page
      * @return \THCFrame\class
      */
-    protected function _all($where = array(), $fields = array("*"), $order = null, $direction = null, $limit = null, $page = null)
+    protected function _all($where = array(), $fields = array("*"), $order = array(), $limit = null, $page = null, $group = null, $having = array())
     {
         $query = $this->connector
                 ->query()
@@ -657,8 +659,20 @@ class Model extends Base
             $query->where($clause, $value);
         }
 
-        if ($order != null) {
-            $query->order($order, $direction);
+        if ($group != null) {
+            $query->groupby($group);
+            
+            if(!empty($having)){
+                foreach ($having as $clause => $value){
+                    $query->having($clause, $value);
+                }
+            }
+        }
+
+        if (!empty($order)) {
+            foreach ($order as $filed => $direction) {
+                $query->order($filed, $direction);
+            }
         }
 
         if ($limit != null) {
@@ -667,6 +681,43 @@ class Model extends Base
 
         $rows = array();
         $class = get_class($this);
+
+        foreach ($query->all() as $row) {
+            $rows[] = new $class($row);
+        }
+
+        return $rows;
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    public static function getQuery($fields)
+    {
+        $model = new static();
+        return $model->_getQuery($fields);
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    protected function _getQuery($fields)
+    {
+        return $this->connector->query()->from($this->table, $fields);
+    }
+
+    /**
+     * 
+     * @param \THCFrame\Database\Query $query
+     * @return \THCFrame\Model\class
+     */
+    public static function initialize(\THCFrame\Database\Query $query)
+    {
+        $model = new static();
+        $rows = array();
+        $class = get_class($model);
 
         foreach ($query->all() as $row) {
             $rows[] = new $class($row);
@@ -693,7 +744,6 @@ class Model extends Base
      */
     public function validate()
     {
-        
         $this->_errors = array();
 
         foreach ($this->columns as $column) {

@@ -13,7 +13,7 @@ use THCFrame\Security\RoleManager;
 /**
  * Description of Security
  *
- * @author Tomy
+ * @author Tomy 
  */
 class Security extends Base
 {
@@ -30,6 +30,12 @@ class Security extends Base
      */
     protected $_roleManager;
 
+    /**
+     * @read
+     * @var type 
+     */
+    protected $_loginCredentials = array();
+    
     /**
      * @read
      * @var type 
@@ -78,11 +84,13 @@ class Security extends Base
 
             if (!empty($parsed->security->default)) {
                 $rolesOptions = (array) $parsed->security->default->roles;
+                $this->_loginCredentials = (array) $parsed->security->default->loginCredentials;
                 $this->_passwordEncoder = $parsed->security->default->encoder;
             }
         } else {
             if (!empty($configuration->security->default)) {
                 $rolesOptions = (array) $configuration->security->default->roles;
+                $this->_loginCredentials = (array) $configuration->security->default->loginCredentials;
                 $this->_passwordEncoder = $configuration->security->default->encoder;
             }
         }
@@ -168,7 +176,6 @@ class Security extends Base
      */
     public function isGranted($requiredRole)
     {
-
         if ($this->_user) {
             $userRole = strtolower($this->_user->getRole());
         } else {
@@ -217,15 +224,15 @@ class Security extends Base
      * @throws Exception\UserPassExpired
      * @throws Exception\Implementation
      */
-    public function authenticate($email, $password, $admin = false)
+    public function authenticate($loginCredential, $password, $admin = false)
     {
         $hash = $this->getHash($password);
 
-        $user = \App_UserModel::first(array(
-                    "email = ?" => $email,
-                    "password = ?" => $hash
+        $user = \App_Model_User::first(array(
+                    "{$this->_loginCredentials["login"]} = ?" => $loginCredential,
+                    "{$this->_loginCredentials["pass"]} = ?" => $hash
         ));
-
+        
         if (NULL !== $user) {
             if ($user instanceof AdvancedUserInterface) {
                 if (!$user->isActive()) {

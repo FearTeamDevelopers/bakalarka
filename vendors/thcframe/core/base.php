@@ -16,6 +16,7 @@ class Base
 {
 
     private $_inspector;
+    protected $_dataStore = array();
 
     /**
      * 
@@ -87,7 +88,7 @@ class Base
             throw new Exception("Call parent::__construct!");
         }
 
-        $getMatches = StringMethods::match($name, "#^get([a-zA-Z0-9]+)$#");
+        $getMatches = StringMethods::match($name, "#^get([a-zA-Z0-9_]+)$#");
         if (count($getMatches) > 0) {
             $normalized = lcfirst($getMatches[0]);
             $property = "_{$normalized}";
@@ -101,13 +102,17 @@ class Base
 
                 if (isset($this->$property)) {
                     return $this->$property;
+                }else{
+                    return null;
                 }
-
+            } elseif (array_key_exists($normalized, $this->_dataStore)) {
+                return $this->_dataStore[$normalized];
+            } else {
                 return null;
             }
         }
 
-        $setMatches = StringMethods::match($name, "#^set([a-zA-Z0-9]+)$#");
+        $setMatches = StringMethods::match($name, "#^set([a-zA-Z0-9_]+)$#");
         if (count($setMatches) > 0) {
             $normalized = lcfirst($setMatches[0]);
             $property = "_{$normalized}";
@@ -120,6 +125,29 @@ class Base
                 }
 
                 $this->$property = $arguments[0];
+                return $this;
+            } else {
+                $this->_dataStore[$normalized] = $arguments[0];
+                return $this;
+            }
+        }
+
+        $unsetMatches = StringMethods::match($name, "#^uns([a-zA-Z0-9_]+)$#");
+        if (count($unsetMatches) > 0) {
+            $normalized = lcfirst($setMatches[0]);
+            $property = "_{$normalized}";
+
+            if (property_exists($this, $property)) {
+                $meta = $this->_inspector->getPropertyMeta($property);
+
+                if (empty($meta["@readwrite"]) && empty($meta["@write"])) {
+                    throw $this->_getReadonlyException($normalized);
+                }
+
+                unset($this->$property);
+                return $this;
+            } else {
+                unset($this->_dataStore[$normalized]);
                 return $this;
             }
         }
@@ -134,6 +162,7 @@ class Base
      */
     public function __get($name)
     {
+
         $function = "get" . ucfirst($name);
         return $this->$function();
     }
@@ -148,6 +177,17 @@ class Base
     {
         $function = "set" . ucfirst($name);
         return $this->$function($value);
+    }
+
+    /**
+     * 
+     * @param type $name
+     * @return type
+     */
+    public function __unset($name)
+    {
+        $function = "uns" . ucfirst($name);
+        return $this->$function();
     }
 
 }

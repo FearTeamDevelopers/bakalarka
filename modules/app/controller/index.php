@@ -34,7 +34,6 @@ class App_Controller_Index extends Controller {
                 $errors['chatErrors'] = array("nemůžete odeslat prázdnou zprávu");
                 $view->set('errors',$errors);
             }else{
-                print_r("bla");die();
                 $konverzace = new App_Model_Konverzace(array(
                    "from" =>$userId,
                     "to" => 1,
@@ -43,6 +42,15 @@ class App_Controller_Index extends Controller {
                     "modified" => date("Y-m-d H:i:s")
                 ));
                 $konverzace->save();
+                
+               $query = App_Model_Konverzace::getQuery(array("tb_konverzace.*"));
+                
+               $query->join("tb_user", "tb_konverzace.from = k.id", "k",array("k.firstname", "k.lastname"))
+                       ->where("tb_konverzace.from = ? ", $userId)
+                       ->whereOr("tb_konverzace.to = ?", $userId);
+                       
+               $vypiskonverzace = App_Model_Konverzace::initialize($query);
+                $view->set('vypiskonverzace', $vypiskonverzace);
             }
         }
     }

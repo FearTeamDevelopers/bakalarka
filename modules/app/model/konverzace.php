@@ -53,5 +53,7 @@ class App_Model_Konverzace extends Model implements UserInterface {
      */
     protected $_modified;
     
-    
+     public function isActive() {
+        return (boolean) $this->_active;
+    }
 }

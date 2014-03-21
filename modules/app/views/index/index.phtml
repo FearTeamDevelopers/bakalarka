@@ -1,30 +1,71 @@
-<div class="logout">
-    <a href="/logout">X</a>
-</div>
-<div class="info">
-    Online Chat
-</div>
-<div class="chatContent">
-    {script $i = 0}
-    {foreach $bla in $queue}
-    {script $i++}
-    {/foreach}
-    {if $i<>1}
-    Jste {echo $i}. v pořadí
-    počkejte pár dní než předchozí uchazeč ukončí konverzaci.
+<header class="chatHeader">
+    <div class="logout">
+        <a href="/logout">X</a>
     </div>
-    {/if}
-    {if $i<2}
+    <div class="info">
+        Online Chat
+    </div>
+</header>
+
+<div class="chatContentWrapper">
+    <div class="chatContent">
+<!----------------------------------------------------------->
+        <!--         pocitani queue-->
+        {script $i = 0}
+        {foreach $bla in $queue}
+        {script $i++}
+        {/foreach}
+<!----------------------------------------------------------->
+
+
+<!----------------------------------------------------------->
+<!--            vypisovani Q-->
+        {if $i<>1}
+        Jste {echo $i}. v pořadí
+        počkejte pár dní než předchozí uchazeč ukončí konverzaci.
     
-    </div>
-    <form method="post" action="#">
-          {if isset($errors["chatErrors"])}
-            <span class="error">
-                {echo join("<br/>", $errors["chatErrors"])}
-            </span>
+        {/if}
+<!----------------------------------------------------------->       
+<!--                    vypisovani zprav-->
+        {if $i<2}
+        <div class="messageWrapper">
+            {foreach $k in $vypiskonverzace}
+
+            {if $k->from = 1}
+            <div  class="messageNameRed">
+                {echo $k->firstname." ".$k->lastname}          
+            </div>
             {/if}
-            <br/>
-    <input type="text" name="chatTextInput" class="chatTextInput"/>
-    <input type="submit" name="chatTextSubmit" class="chatTextSubmit" value="odeslat"/>
+            {if $k->from <> 1} 
+            <div  class="messageNameBlue">
+                {echo $k->firstname." ".$k->lastname}
+            </div>
+            {/if}
+
+            <div class="message">
+                {echo $k->message}
+            </div>
+            {/foreach}        
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<div class="chatInputs">
+    <form method="post" action="#">
+        {if isset($errors["chatErrors"])}
+        <span class="error">
+            {echo join("<br/>", $errors["chatErrors"])}
+        </span>
+        {/if}
+        <br/>
+        <input type="text" name="chatTextInput" class="chatTextInput"/>
+        <input type="submit" name="chatTextSubmit" class="chatTextSubmit" value="odeslat"/>
     </form>
-    {/if}
+    
+</div>
+{/if}
