@@ -1,18 +1,19 @@
 <nav>
     <ul id="menu">
+        <li id="active"><a href="/">Home</a></li>
         {if !isset($authUser)}
-        <li id="active"><a href="/">Pedak</a></li>
-        <li class="end"><a href="/admin/login">Login</a></li>
+        <li><a href="/team">Team</a></li>
+        <li><a href="/zapasy">Zápasy</a></li>
+        <li><a href="/kontakt">Kontakt</a></li>
+        <li class="end"><a href="/login">Přihlásit se</a></li>
         {/if}
         {else}
-        <li id="active"><a href="/admin/">Home</a></li>
-        <li><a href="/admin/news/">News</a></li>
-        <li><a href="/admin/match/">Matches</a></li>
-        <li><a href="/admin/gallery/">Gallery</a></li>
-        <li><a href="/admin/training/">Trainings</a></li>
-        <li><a href="/admin/sponsor/">Sponsors</a></li>
-        <li><a href="/admin/user/">Users</a></li>
-        <li class="end"><a href="/admin/logout">Logout</a></li>
+        <li><a href="/team">Team</a></li>
+        <li><a href="/zapasy">Zápasy</a></li>
+        <li><a href="/kecarna">Kecárna</a></li>
+        <li><a href="/treninky">Tréninky</a></li>
+        <li><a href="/profil">Profil</a></li>
+        <li class="end"><a href="/logout">Odhlásit se</a></li>
         {/else}
     </ul>
 </nav>

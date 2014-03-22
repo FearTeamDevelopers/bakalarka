@@ -28,7 +28,7 @@ class App_Controller_Index extends Controller
 
         $queueStatus = App_Model_Queue::first(array('idUser = ?' => $userId, 'active = ?' => true));
         if ($queueStatus) {
-            $queueCount = 0;
+            $queueCount = 1;
         } else {
             $queueCount = App_Model_Queue::count(
                             array(
@@ -37,12 +37,13 @@ class App_Controller_Index extends Controller
                             )
             );
             if (null === $queueCount) {
-                $queueCount = 0;
+                $queueCount = 1;
             }
         }
 
 
-        $view->set('queuecount', $queueCount);
+        $view->set('queuecount', $queueCount+1)
+             ->set('questatus', $queueStatus);
 
         $query = App_Model_Konverzace::getQuery(array("tb_konverzace.*"));
 
@@ -54,6 +55,9 @@ class App_Controller_Index extends Controller
         $view->set('vypiskonverzace', $vypiskonverzace);
     }
 
+    /**
+     * 
+     */
     public function submitChat()
     {
         $view = $this->getActionView();
@@ -86,6 +90,9 @@ class App_Controller_Index extends Controller
         }
     }
 
+    /**
+     * 
+     */
     public function loadKonversation()
     {
         $this->willRenderLayoutView = false;
@@ -98,26 +105,67 @@ class App_Controller_Index extends Controller
             $userId = $user->getId();
         }
 
-        $query = App_Model_Konverzace::getQuery(array("tb_konverzace.*"));
+        $queue = App_Model_Queue::first(array("idUser = ?" => $userId, "active = ?" => true));
+        if ($queue != null) {
 
-        $query->join("tb_user", "tb_konverzace.from = k.id", "k", array("k.firstname", "k.lastname"))
-                ->wheresql("tb_konverzace.from = {$userId} OR tb_konverzace.to = {$userId}")
-                ->order("tb_konverzace.created", "desc");
+            $query = App_Model_Konverzace::getQuery(array("tb_konverzace.*"));
 
-        $vypiskonverzace = App_Model_Konverzace::initialize($query);
-        $str = '';
+            $query->join("tb_user", "tb_konverzace.from = k.id", "k", array("k.firstname", "k.lastname"))
+                    ->wheresql("tb_konverzace.from = {$userId} OR tb_konverzace.to = {$userId}")
+                    ->order("tb_konverzace.created", "desc");
 
-        foreach ($vypiskonverzace as $k) {
-            if ($k->from == 1) {
-                $str .= "<div  class=\"messageNameRed\">{$k->firstname} {$k->lastname}</div>";
-            } elseif ($k->from != 1) {
-                $str .= "<div  class=\"messageNameBlue\">{$k->firstname} {$k->lastname}</div>";
+            $vypiskonverzace = App_Model_Konverzace::initialize($query);
+            $str = '';
+
+            foreach ($vypiskonverzace as $k) {
+                if ($k->from == 1) {
+                    $str .= "<div  class=\"messageNameRed\">{$k->firstname} {$k->lastname}</div>";
+                } elseif ($k->from != 1) {
+                    $str .= "<div  class=\"messageNameBlue\">{$k->firstname} {$k->lastname}</div>";
+                }
+
+                $str .= "<div class=\"message\">{$k->message}</div>";
             }
 
-            $str .= "<div class=\"message\">{$k->message}</div>";
+            echo $str;
+        } else {
+            $queueStart = 1;
+
+            $queueCount = App_Model_Queue::count(
+                            array(
+                                'active = ?' => false,
+                                'idUser <> ?' => $userId
+            ));
+            if ($queueCount == null) {
+                $queueCount = 1;
+            }
+            $queueCount += $queueStart;
+            echo "Jste {$queueCount}. v pořadí počkejte pár dní než předchozí uchazeč ukončí konverzaci.";
+        }
+    }
+
+    /**
+     * 
+     */
+    public function checkStatus()
+    {
+        $this->willRenderLayoutView = false;
+        $this->willRenderActionView = false;
+
+        $session = Registry::get("session");
+
+        $user = $session->get("user");
+
+        if ($user) {
+            $userId = $user->getId();
         }
 
-        echo $str;
+        $queue = App_Model_Queue::first(array("idUser = ?" => $userId, "active = ?" => true));
+        if ($queue != null) {
+            echo 'ok';
+        } else {
+            echo 'no';
+        }
     }
 
 }

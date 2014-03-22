@@ -1,6 +1,6 @@
 <?php
 
-use Admin\Libraries\Controller as Controller;
+use Admin\Etc\Controller as Controller;
 use THCFrame\Registry\Registry as Registry;
 use THCFrame\Request\RequestMethods as RequestMethods;
 
@@ -18,39 +18,7 @@ class Admin_Controller_User extends Controller {
      * @return string
      * @throws \Exception
      */
-    private function _upload($name, $user) {
-
-        if (isset($_FILES[$name]) && !empty($_FILES[$name]["name"])) {
-            $file = $_FILES[$name];
-            $path = "/public/uploads/team/";
-
-            $size = filesize($file["tmp_name"]);
-            $extension = pathinfo($file["name"], PATHINFO_EXTENSION);
-            $filename = $user->getEmail() . "_" . $user->getId() . "." . $extension;
-
-            if ($size > 5000000) {
-                throw new \Exception("Image size exceeds the maximum size limit");
-            } elseif (!in_array($extension, self::$_imageExtensions)) {
-                throw new \Exception("Images can only be with jpg, jpeg, png or gif extension");
-            } elseif (file_exists("." . $path . $filename)) {
-                unlink("." . $path . $filename);
-
-                if (move_uploaded_file($file["tmp_name"], "." . $path . $filename)) {
-                    return $path . $filename;
-                } else {
-                    throw new \Exception("An error occured while uploading the photo");
-                }
-            } else {
-                if (move_uploaded_file($file["tmp_name"], "." . $path . $filename)) {
-                    return $path . $filename;
-                } else {
-                    throw new \Exception("An error occured while uploading the photo");
-                }
-            }
-        } else {
-            return "";
-        }
-    }
+    
 
     /**
      * 

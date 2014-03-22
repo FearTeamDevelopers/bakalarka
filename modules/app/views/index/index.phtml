@@ -9,17 +9,16 @@
 
 <div class="chatContentWrapper">
     <div class="chatContent">
-
-        <!----------------------------------------------------------->
+        <div class="messageWrapper">
+              <!----------------------------------------------------------->
         <!--            vypisovani Q-->
-        {if $queuecount != 0}
+        {if $questatus == false}
         Jste {echo $queuecount}. v pořadí
         počkejte pár dní než předchozí uchazeč ukončí konverzaci.
         {/if}
         <!----------------------------------------------------------->       
         <!--                    vypisovani zprav-->
         {else}
-        <div class="messageWrapper">
             {foreach $k in $vypiskonverzace}
 
             {if $k->from = 1}
@@ -37,12 +36,13 @@
                 {echo $k->message}
             </div>
             {/foreach}        
-        </div>
         {/else}
+        </div>
+        
 
     </div>
 
-    {if $queuecount == 0}
+    {if $questatus == true}
     <div class="chatInputs">
         <form id="inputForm" method="post" action="/submitChat">
 

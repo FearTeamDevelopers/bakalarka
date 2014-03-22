@@ -30,4 +30,20 @@ $(document).ready(function() {
 
 setInterval(function() {
     $(".chatContent .messageWrapper").load("/app/index/loadKonversation/");
+    var bla = $(".chatInputs").is(":visible");
+    if(bla == false){
+        $.post("/app/index/checkStatus/", function(msg){
+            if(msg == 'ok'){
+                location.reload(1);
+            }else{
+                $(".chatInputs").hide();
+            }
+        });
+    }else{
+        $.post("/app/index/checkStatus/", function(msg){
+            if(msg == 'no'){
+                $(".chatInputs").hide();
+            }
+        });
+    }
 }, 5000);

@@ -1,25 +1,65 @@
-<article class="grid_12">
-    <h1>Dashboard</h1>
-    <br/>
-    <div class="grid_3">
-        <a class="dashboard-button" href="/admin/news/add/">Add news</a>
+<div class="queueDiv">
+    {foreach $bla in $qarray}
+    <div class="qUserWrapper">
+        <div class="qUserName">
+            {echo $bla->firstname." ".$bla->lastname}
+        </div>
+        <form method="post" action="/admin/index/changeStatus/{echo $bla->id}" class="qButtons">
+            <input type="submit" class="qChangeStatus" value="Active"/>
+        </form>
     </div>
-    
-    <div class="grid_3">
-        <a class="dashboard-button" href="/admin/match/add/">Add match</a>
+    {/foreach}
+</div>
+<header class="chatHeader">
+    <div class="logout">
+        <a href="/admin/logout">X</a>
     </div>
-    
-    <div class="grid_3">
-        <a class="dashboard-button" href="/admin/training/add/">Add training</a>
+    <div class="info">
+        Online Chat
     </div>
-    
-    <div class="grid_3">
-        <a class="dashboard-button" href="/admin/user/add/">Add user</a>
-    </div>
-</article>
+</header>
+<div class="chatWindow">
+    <div class="chatContentWrapper">
+        <div class="chatContent">
+            <div class="messageWrapper">
+                               
+                {foreach $k in $vypiskonverzace}
 
-<article class="grid_12">
-    <div class="grid_3">
-        <a class="dashboard-button" href="/admin/gallery/add/">Add gallery</a>
+                {if $k->from = 1}
+                <div  class="messageNameRed">
+                    {echo $k->firstname." ".$k->lastname}          
+                </div>
+                {/if}
+                {if $k->from <> 1} 
+                <div  class="messageNameBlue">
+                    {echo $k->firstname." ".$k->lastname}
+                </div>
+                {/if}
+
+                <div class="message">
+                    {echo $k->message}
+                </div>
+                {/foreach}        
+               
+            </div>
+
+
+        </div>
+
+        <div class="chatInputs">
+            <form id="inputForm" method="post" action="/admin/submitChat">
+
+                {if isset($error)}
+                <span class="error">
+                    {echo $error}
+                </span>
+                {/if}
+
+                <br/>
+                <input type="text" name="chatTextInput" class="chatTextInput" required/>
+                <input type="submit" name="chatTextSubmit" value="Odeslat" />
+            </form>
+        </div>
+
     </div>
-</article>
+</div>
