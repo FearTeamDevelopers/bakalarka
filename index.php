@@ -1,6 +1,9 @@
 <?php
 
-define("DEBUG", TRUE);
+define('ENV', 'dev');
+//define('ENV', 'qa');
+//define('ENV', 'live');
+
 define("APP_PATH", __DIR__);
 
 // core
@@ -20,8 +23,8 @@ foreach ($iterator as $item) {
 
 //module loading
 
-THCFrame\Core\Core::registerModule(new App_Module());
-THCFrame\Core\Core::registerModule(new Admin_Module());
+$modules = array('App', 'Admin');
+THCFrame\Core\Core::registerModules($modules);
 
 // load services and run dispatcher
 THCFrame\Core\Core::run();

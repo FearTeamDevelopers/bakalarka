@@ -43,15 +43,15 @@ class View extends Base
     {
         parent::__construct($options);
 
-        Events::fire("framework.view.construct.before", array($this->file));
+        Events::fire('framework.view.construct.before', array($this->file));
 
         $this->_template = new Template\Template(array(
-            "implementation" => new Template\Implementation\Extended()
+            'implementation' => new Template\Implementation\Extended()
         ));
 
         $this->_checkMessage();
-
-        Events::fire("framework.view.construct.after", array($this->file, $this->template));
+        
+        Events::fire('framework.view.construct.after', array($this->file, $this->template));
     }
 
     /**
@@ -61,7 +61,7 @@ class View extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -70,17 +70,17 @@ class View extends Base
     private function _checkMessage()
     {
         if (isset($_SESSION['flashMessage'])) {
-            $this->set("flashMessage", $_SESSION['flashMessage']);
+            $this->set('flashMessage', $_SESSION['flashMessage']);
             unset($_SESSION['flashMessage']);
         } else {
-            $this->set("flashMessage", "");
+            $this->set('flashMessage', '');
         }
 
         if (isset($_SESSION['longFlashMessage'])) {
-            $this->set("longFlashMessage", $_SESSION['longFlashMessage']);
+            $this->set('longFlashMessage', $_SESSION['longFlashMessage']);
             unset($_SESSION['longFlashMessage']);
         } else {
-            $this->set("longFlashMessage", "");
+            $this->set('longFlashMessage', '');
         }
     }
 
@@ -90,10 +90,10 @@ class View extends Base
      */
     public function render()
     {
-        Events::fire("framework.view.render.before", array($this->file));
+        Events::fire('framework.view.render.before', array($this->file));
 
         if (!file_exists($this->file)) {
-            return "";
+            return '';
         }
 
         return $this->template
@@ -107,7 +107,7 @@ class View extends Base
      * @param type $default
      * @return type
      */
-    public function get($key, $default = "")
+    public function get($key, $default = '')
     {
         if (isset($this->data[$key])) {
             return $this->data[$key];
@@ -124,7 +124,7 @@ class View extends Base
     protected function _set($key, $value)
     {
         if (!is_string($key) && !is_numeric($key)) {
-            throw new Exception\Data("Key must be a string or a number");
+            throw new Exception\Data('Key must be a string or a number');
         }
 
         $data = $this->data;
@@ -172,7 +172,7 @@ class View extends Base
      * @param text $msg
      * @return text
      */
-    public function flashMessage($msg = "")
+    public function flashMessage($msg = '')
     {
         if (!empty($msg)) {
             $_SESSION['flashMessage'] = $msg;
@@ -186,7 +186,7 @@ class View extends Base
      * @param text $msg
      * @return text
      */
-    public function longFlashMessage($msg = "")
+    public function longFlashMessage($msg = '')
     {
         if (!empty($msg)) {
             $_SESSION['longFlashMessage'] = $msg;

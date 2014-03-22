@@ -30,62 +30,62 @@ class Model extends Base
      * @read
      */
     protected $_types = array(
-        "auto_increment",
-        "text",
-        "integer",
-        "tinyint",
-        "decimal",
-        "boolean",
-        "datetime",
+        'auto_increment',
+        'text',
+        'integer',
+        'tinyint',
+        'decimal',
+        'boolean',
+        'datetime',
     );
 
     /**
      * @read
      */
     protected $_validators = array(
-        "required" => array(
-            "handler" => "_validateRequired",
-            "message" => "The {0} field is required"
+        'required' => array(
+            'handler' => '_validateRequired',
+            'message' => 'The {0} field is required'
         ),
-        "alpha" => array(
-            "handler" => "_validateAlpha",
-            "message" => "The {0} field can only contain letters"
+        'alpha' => array(
+            'handler' => '_validateAlpha',
+            'message' => 'The {0} field can only contain letters'
         ),
-        "numeric" => array(
-            "handler" => "_validateNumeric",
-            "message" => "The {0} field can only contain numbers"
+        'numeric' => array(
+            'handler' => '_validateNumeric',
+            'message' => 'The {0} field can only contain numbers'
         ),
-        "alphanumeric" => array(
-            "handler" => "_validateAlphaNumeric",
-            "message" => "The {0} field can only contain letters and numbers"
+        'alphanumeric' => array(
+            'handler' => '_validateAlphaNumeric',
+            'message' => 'The {0} field can only contain letters and numbers'
         ),
-        "max" => array(
-            "handler" => "_validateMax",
-            "message" => "The {0} field must contain less than {2} characters"
+        'max' => array(
+            'handler' => '_validateMax',
+            'message' => 'The {0} field must contain less than {2} characters'
         ),
-        "min" => array(
-            "handler" => "_validateMin",
-            "message" => "The {0} field must contain more than {2} characters"
+        'min' => array(
+            'handler' => '_validateMin',
+            'message' => 'The {0} field must contain more than {2} characters'
         ),
-        "email" => array(
-            "handler" => "_validateEmail",
-            "message" => "The {0} field must contain valid email address"
+        'email' => array(
+            'handler' => '_validateEmail',
+            'message' => 'The {0} field must contain valid email address'
         ),
-        "url" => array(
-            "handler" => "_validateMin",
-            "message" => "The {0} field must contain valid url"
+        'url' => array(
+            'handler' => '_validateMin',
+            'message' => 'The {0} field must contain valid url'
         ),
-        "datetime" => array(
-            "handler" => "_validateDatetime",
-            "message" => "The {0} field must contain valid date and time (yyyy-mm-dd hh:mm)"
+        'datetime' => array(
+            'handler' => '_validateDatetime',
+            'message' => 'The {0} field must contain valid date and time (yyyy-mm-dd hh:mm)'
         ),
-        "date" => array(
-            "handler" => "_validateDate",
-            "message" => "The {0} field must contain valid date (yyyy-mm-dd)"
+        'date' => array(
+            'handler' => '_validateDate',
+            'message' => 'The {0} field must contain valid date (yyyy-mm-dd)'
         ),
-        "time" => array(
-            "handler" => "_validateTime",
-            "message" => "The {0} field must contain valid time (hh:mm / hh:mm:ss)"
+        'time' => array(
+            'handler' => '_validateTime',
+            'message' => 'The {0} field must contain valid time (hh:mm / hh:mm:ss)'
         )
     );
    
@@ -103,7 +103,7 @@ class Model extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -121,7 +121,7 @@ class Model extends Base
         foreach ($where as $clause => $value) {
             $query->where($clause, $value);
         }
-
+        
         return $query->count();
     }
 
@@ -142,10 +142,10 @@ class Model extends Base
      */
     protected function _validateAlpha($value)
     {
-        if ($value == "") {
+        if ($value == '') {
             return true;
         } else {
-            return StringMethods::match($value, "#^([a-zA-Zá-žÁ-Ž_-\s\?\.,!:()+=\"]*)$#");
+            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž_-\s\?\.,!:()+=\"]*)$#');
         }
     }
 
@@ -156,10 +156,10 @@ class Model extends Base
      */
     protected function _validateNumeric($value)
     {
-        if ($value == "") {
+        if ($value == '') {
             return true;
         } else {
-            return StringMethods::match($value, "#^([0-9-]*)$#");
+            return StringMethods::match($value, '#^([0-9-]*)$#');
         }
     }
 
@@ -170,10 +170,10 @@ class Model extends Base
      */
     protected function _validateAlphaNumeric($value)
     {
-        if ($value == "") {
+        if ($value == '') {
             return true;
         } else {
-            return StringMethods::match($value, "#^([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"]*)$#");
+            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"]*)$#');
         }
     }
 
@@ -226,7 +226,7 @@ class Model extends Base
      */
     protected function _validateDatetime($value)
     {
-        list($date, $time) = explode(" ", $value);
+        list($date, $time) = explode(' ', $value);
 
         $validDate = $this->_validateDate($date);
         $validTime = $this->_validateTime($time);
@@ -245,20 +245,20 @@ class Model extends Base
      */
     protected function _validateDate($value)
     {
-        $format = "yyyy-mm-dd";
+        $format = Registry::get('dateformat');
 
         if (strlen($value) >= 6 && strlen($format) == 10) {
 
-            $separator_only = str_replace(array("m", "d", "y"), "", $format);
+            $separator_only = str_replace(array('m', 'd', 'y'), '', $format);
             $separator = $separator_only[0]; // separator is first character 
 
             if ($separator && strlen($separator_only) == 2) {
-                $regexp = str_replace("mm", "(0?[1-9]|1[0-2])", $format);
-                $regexp = str_replace("dd", "(0?[1-9]|[1-2][0-9]|3[0-1])", $regexp);
-                $regexp = str_replace("yyyy", "(19|20)?[0-9][0-9]", $regexp);
+                $regexp = str_replace('mm', '(0?[1-9]|1[0-2])', $format);
+                $regexp = str_replace('dd', '(0?[1-9]|[1-2][0-9]|3[0-1])', $regexp);
+                $regexp = str_replace('yyyy', '(19|20)?[0-9][0-9]', $regexp);
                 //$regexp = str_replace($separator, "\\" . $separator, $regexp);
 
-                if ($regexp != $value && preg_match("/" . $regexp . "\z/", $value)) {
+                if ($regexp != $value && preg_match('/' . $regexp . '\z/', $value)) {
                     $arr = explode($separator, $value);
                     $day = $arr[2];
                     $month = $arr[1];
@@ -280,7 +280,7 @@ class Model extends Base
      */
     protected function _validateTime($value)
     {
-        return preg_match("/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/", $value);
+        return preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/', $value);
     }
 
     /**
@@ -301,8 +301,8 @@ class Model extends Base
     {
         $primary = $this->primaryColumn;
 
-        $raw = $primary["raw"];
-        $name = $primary["name"];
+        $raw = $primary['raw'];
+        $name = $primary['name'];
 
         if (!empty($this->$raw)) {
             $previous = $this->connector
@@ -312,7 +312,7 @@ class Model extends Base
                     ->first();
 
             if ($previous == null) {
-                throw new Exception\Primary("Primary key value invalid");
+                throw new Exception\Primary('Primary key value invalid');
             }
 
             foreach ($previous as $key => $value) {
@@ -332,8 +332,8 @@ class Model extends Base
     {
         $primary = $this->primaryColumn;
 
-        $raw = $primary["raw"];
-        $name = $primary["name"];
+        $raw = $primary['raw'];
+        $name = $primary['name'];
 
         if (!empty($this->$raw)) {
             return $this->connector
@@ -382,8 +382,8 @@ class Model extends Base
 
         $primary = $this->primaryColumn;
 
-        $raw = $primary["raw"];
-        $name = $primary["name"];
+        $raw = $primary['raw'];
+        $name = $primary['name'];
 
         $query = $this->connector
                 ->query()
@@ -395,14 +395,14 @@ class Model extends Base
 
         $data = array();
         foreach ($this->columns as $key => $column) {
-            if (!$column["read"]) {
-                $prop = $column["raw"];
+            if (!$column['read']) {
+                $prop = $column['raw'];
                 $data[$key] = $this->$prop;
                 continue;
             }
 
             if ($column != $this->primaryColumn && $column) {
-                $method = "get" . ucfirst($key);
+                $method = 'get' . ucfirst($key);
                 $data[$key] = $this->$method();
                 continue;
             }
@@ -434,9 +434,9 @@ class Model extends Base
     public function getTable()
     {
         if (empty($this->_table)) {
-            list($module, $type, $name) = explode("_", get_class($this));
+            list($module, $type, $name) = explode('_', get_class($this));
 
-            if (strtolower($type) == "model" && !empty($name)) {
+            if (strtolower($type) == 'model' && !empty($name)) {
                 $this->_table = strtolower("tb_{$name}");
             }
         }
@@ -453,10 +453,10 @@ class Model extends Base
     {
 
         if (empty($this->_connector)) {
-            $database = Registry::get("database");
+            $database = Registry::get('database');
 
             if (!$database) {
-                throw new Exception\Connector("No connector availible");
+                throw new Exception\Connector('No connector availible');
             }
 
             $this->_connector = $database->initialize();
@@ -492,22 +492,22 @@ class Model extends Base
             foreach ($properties as $property) {
                 $propertyMeta = $inspector->getPropertyMeta($property);
 
-                if (!empty($propertyMeta["@column"])) {
-                    $name = preg_replace("#^_#", "", $property);
-                    $primary = !empty($propertyMeta["@primary"]);
-                    $type = $first($propertyMeta, "@type");
-                    $length = $first($propertyMeta, "@length");
-                    $index = !empty($propertyMeta["@index"]);
-                    $unique = !empty($propertyMeta["@unique"]);
-                    $readwrite = !empty($propertyMeta["@readwrite"]);
-                    $read = !empty($propertyMeta["@read"]) || $readwrite;
-                    $write = !empty($propertyMeta["@write"]) || $readwrite;
+                if (!empty($propertyMeta['@column'])) {
+                    $name = preg_replace('#^_#', '', $property);
+                    $primary = !empty($propertyMeta['@primary']);
+                    $type = $first($propertyMeta, '@type');
+                    $length = $first($propertyMeta, '@length');
+                    $index = !empty($propertyMeta['@index']);
+                    $unique = !empty($propertyMeta['@unique']);
+                    $readwrite = !empty($propertyMeta['@readwrite']);
+                    $read = !empty($propertyMeta['@read']) || $readwrite;
+                    $write = !empty($propertyMeta['@write']) || $readwrite;
 
-                    $validate = !empty($propertyMeta["@validate"]) ? $propertyMeta["@validate"] : false;
-                    $label = $first($propertyMeta, "@label");
+                    $validate = !empty($propertyMeta['@validate']) ? $propertyMeta['@validate'] : false;
+                    $label = $first($propertyMeta, '@label');
 
                     if (!in_array($type, $types)) {
-                        throw new Exception\Type(sprintf("%s is not a valid type", $type));
+                        throw new Exception\Type(sprintf('%s is not a valid type', $type));
                     }
 
                     if ($primary) {
@@ -515,23 +515,23 @@ class Model extends Base
                     }
 
                     $columns[$name] = array(
-                        "raw" => $property,
-                        "name" => $name,
-                        "primary" => $primary,
-                        "type" => $type,
-                        "length" => $length,
-                        "index" => $index,
-                        "unique" => $unique,
-                        "read" => $read,
-                        "write" => $write,
-                        "validate" => $validate,
-                        "label" => $label
+                        'raw' => $property,
+                        'name' => $name,
+                        'primary' => $primary,
+                        'type' => $type,
+                        'length' => $length,
+                        'index' => $index,
+                        'unique' => $unique,
+                        'read' => $read,
+                        'write' => $write,
+                        'validate' => $validate,
+                        'label' => $label
                     );
                 }
             }
 
             if ($primaries !== 1) {
-                throw new Exception\Primary(sprintf("%s must have exactly one @primary column", $primary));
+                throw new Exception\Primary(sprintf('%s must have exactly one @primary column', $primary));
             }
 
             $this->_columns = $columns;
@@ -563,7 +563,7 @@ class Model extends Base
             $primary;
 
             foreach ($this->columns as $column) {
-                if ($column["primary"]) {
+                if ($column['primary']) {
                     $primary = $column;
                     break;
                 }
@@ -583,7 +583,7 @@ class Model extends Base
      * @param type $direction
      * @return type
      */
-    public static function first($where = array(), $fields = array("*"), $order = array())
+    public static function first($where = array(), $fields = array('*'), $order = array())
     {
         $model = new static();
         return $model->_first($where, $fields, $order);
@@ -597,7 +597,7 @@ class Model extends Base
      * @param type $direction
      * @return \THCFrame\class|null
      */
-    protected function _first($where = array(), $fields = array("*"), $order = array())
+    protected function _first($where = array(), $fields = array('*'), $order = array())
     {
         $query = $this->connector
                 ->query()
@@ -633,7 +633,7 @@ class Model extends Base
      * @param type $page
      * @return type
      */
-    public static function all($where = array(), $fields = array("*"), $order = array(), $limit = null, $page = null, $group = null, $having = array())
+    public static function all($where = array(), $fields = array('*'), $order = array(), $limit = null, $page = null, $group = null, $having = array())
     {
         $model = new static();
         return $model->_all($where, $fields, $order, $limit, $page, $group, $having);
@@ -649,7 +649,7 @@ class Model extends Base
      * @param type $page
      * @return \THCFrame\class
      */
-    protected function _all($where = array(), $fields = array("*"), $order = array(), $limit = null, $page = null, $group = null, $having = array())
+    protected function _all($where = array(), $fields = array('*'), $order = array(), $limit = null, $page = null, $group = null, $having = array())
     {
         $query = $this->connector
                 ->query()
@@ -747,13 +747,13 @@ class Model extends Base
         $this->_errors = array();
 
         foreach ($this->columns as $column) {
-            if ($column["validate"]) {
-                $pattern = "#[a-z]+\(([a-zA-Z0-9, ]+)\)#";
+            if ($column['validate']) {
+                $pattern = '#[a-z]+\(([a-zA-Z0-9, ]+)\)#';
 
-                $raw = $column["raw"];
-                $name = $column["name"];
-                $validators = $column["validate"];
-                $label = $column["label"];
+                $raw = $column['raw'];
+                $name = $column['name'];
+                $validators = $column['validate'];
+                $label = $column['label'];
 
                 $defined = $this->getValidators();
 
@@ -766,24 +766,24 @@ class Model extends Base
                     $match = StringMethods::match($validator, $pattern);
 
                     if (count($match) > 0) {
-                        $matches = StringMethods::split($match[0], ",\s*");
+                        $matches = StringMethods::split($match[0], ',\s*');
                         $arguments = array_merge($arguments, $matches);
-                        $offset = StringMethods::indexOf($validator, "(");
+                        $offset = StringMethods::indexOf($validator, '(');
                         $function = substr($validator, 0, $offset);
                     }
 
                     if (!isset($defined[$function])) {
-                        throw new Exception\Validation(sprintf("The %s validator is not defined", $function));
+                        throw new Exception\Validation(sprintf('The %s validator is not defined', $function));
                     }
 
                     $template = $defined[$function];
 
-                    if (!call_user_func_array(array($this, $template["handler"]), $arguments)) {
+                    if (!call_user_func_array(array($this, $template['handler']), $arguments)) {
                         $replacements = array_merge(array(
                             $label ? $label : $raw
                                 ), $arguments);
 
-                        $message = $template["message"];
+                        $message = $template['message'];
 
                         foreach ($replacements as $i => $replacement) {
                             $message = str_replace("{{$i}}", $replacement, $message);

@@ -55,7 +55,7 @@ class Request extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -77,7 +77,7 @@ class Request extends Base
      */
     protected function _normalize($key)
     {
-        return "CURLOPT_" . str_replace("CURLOPT_", "", strtoupper($key));
+        return 'CURLOPT_' . str_replace('CURLOPT_', '', strtoupper($key));
     }
 
     /**
@@ -88,13 +88,13 @@ class Request extends Base
     protected function _setRequestMethod($method)
     {
         switch (strtoupper($method)) {
-            case "HEAD":
+            case 'HEAD':
                 $this->_setOption(CURLOPT_NOBODY, true);
                 break;
-            case "GET":
+            case 'GET':
                 $this->_setOption(CURLOPT_HTTPGET, true);
                 break;
-            case "POST":
+            case 'POST':
                 $this->_setOption(CURLOPT_POST, true);
                 break;
             default:
@@ -127,7 +127,7 @@ class Request extends Base
         }
 
         if ($this->willShareSession) {
-            $this->_setOption(CURLOPT_COOKIE, session_name() . "=" . session_id());
+            $this->_setOption(CURLOPT_COOKIE, session_name() . '=' . session_id());
         }
 
         if ($this->referer) {
@@ -164,7 +164,7 @@ class Request extends Base
     public function __construct($options = array())
     {
         parent::__construct($options);
-        $this->agent = RequestMethods::server("HTTP_USER_AGENT", "Curl/PHP " . PHP_VERSION);
+        $this->agent = RequestMethods::server('HTTP_USER_AGENT', 'Curl/PHP ' . PHP_VERSION);
     }
 
     /**
@@ -175,7 +175,7 @@ class Request extends Base
      */
     public function delete($url, $parameters = array())
     {
-        return $this->request("DELETE", $url, $parameters);
+        return $this->request('DELETE', $url, $parameters);
     }
 
     /**
@@ -187,10 +187,10 @@ class Request extends Base
     public function get($url, $parameters = array())
     {
         if (!empty($parameters)) {
-            $url .= StringMethods::indexOf($url, "?") ? "&" : "?";
-            $url .= is_string($parameters) ? $parameters : http_build_query($parameters, "", "&");
+            $url .= StringMethods::indexOf($url, '?') ? '&' : '?';
+            $url .= is_string($parameters) ? $parameters : http_build_query($parameters, '', '&');
         }
-        return $this->request("GET", $url);
+        return $this->request('GET', $url);
     }
 
     /**
@@ -201,7 +201,7 @@ class Request extends Base
      */
     public function head($url, $parameters = array())
     {
-        return $this->request("HEAD", $url, $parameters);
+        return $this->request('HEAD', $url, $parameters);
     }
 
     /**
@@ -212,7 +212,7 @@ class Request extends Base
      */
     public function post($url, $parameters = array())
     {
-        return $this->request("POST", $url, $parameters);
+        return $this->request('POST', $url, $parameters);
     }
 
     /**
@@ -223,7 +223,7 @@ class Request extends Base
      */
     public function put($url, $parameters = array())
     {
-        return $this->request("PUT", $url, $parameters);
+        return $this->request('PUT', $url, $parameters);
     }
 
     /**
@@ -238,12 +238,12 @@ class Request extends Base
     {
         session_write_close();
 
-        Events::fire("framework.request.request.before", array($method, $url, $parameters));
+        Events::fire('framework.request.request.before', array($method, $url, $parameters));
 
         $request = $this->_request = curl_init();
 
         if (is_array($parameters)) {
-            $parameters = http_build_query($parameters, "", "&");
+            $parameters = http_build_query($parameters, '', '&');
         }
 
         $this->_setRequestMethod($method)
@@ -257,14 +257,14 @@ class Request extends Base
         }
 
         if ($response) {
-            $response = new Request\Response(array(
-                "response" => $response
+            $response = new Response(array(
+                'response' => $response
             ));
         } else {
             throw new Exception\Response(ucfirst(curl_error($request)));
         }
 
-        Events::fire("framework.request.request.after", array($method, $url, $parameters, $response));
+        Events::fire('framework.request.request.after', array($method, $url, $parameters, $response));
 
         curl_close($request);
         return $response;

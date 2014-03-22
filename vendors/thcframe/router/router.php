@@ -112,7 +112,7 @@ class Router extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -121,31 +121,31 @@ class Router extends Base
     private function _createRoutes($routes)
     {
         foreach ($routes as $route) {
-            $new_route = new Route\Dynamic(array("pattern" => $route['pattern']));
+            $new_route = new Route\Dynamic(array('pattern' => $route['pattern']));
 
-            if (preg_match("/^:/", $route['module'])) {
+            if (preg_match('/^:/', $route['module'])) {
                 $new_route->addDynamicElement(':module', ':module');
             } else {
                 $new_route->setModule($route['module']);
             }
 
-            if (preg_match("/^:/", $route['controller'])) {
+            if (preg_match('/^:/', $route['controller'])) {
                 $new_route->addDynamicElement(':controller', ':controller');
             } else {
                 $new_route->setController($route['controller']);
             }
 
-            if (preg_match("/^:/", $route['action'])) {
+            if (preg_match('/^:/', $route['action'])) {
                 $new_route->addDynamicElement(':action', ':action');
             } else {
                 $new_route->setAction($route['action']);
             }
 
-            if (isset($route['args']) && preg_match("/^:/", $route['args'])) {
+            if (isset($route['args']) && preg_match('/^:/', $route['args'])) {
                 $new_route->addDynamicElement($route['args'], $route['args']);
             }
 
-            if (isset($route['args2']) && preg_match("/^:/", $route['args2'])) {
+            if (isset($route['args2']) && preg_match('/^:/', $route['args2'])) {
                 $new_route->addDynamicElement($route['args2'], $route['args2']);
             }
 
@@ -160,7 +160,7 @@ class Router extends Base
      */
     private function _findRoute($path)
     {
-        Events::fire("framework.router.findroute.before", array($path));
+        Events::fire('framework.router.findroute.before', array($path));
 
         foreach ($this->_routes as $route) {
             if (TRUE === $route->matchMap($path)) {
@@ -169,7 +169,7 @@ class Router extends Base
             }
         }
 
-        Events::fire("framework.router.findroute.after", array(
+        Events::fire('framework.router.findroute.after', array(
             $path,
             $this->_lastRoute->module,
             $this->_lastRoute->controller,

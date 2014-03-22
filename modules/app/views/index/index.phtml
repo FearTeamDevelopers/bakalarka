@@ -9,25 +9,16 @@
 
 <div class="chatContentWrapper">
     <div class="chatContent">
-<!----------------------------------------------------------->
-        <!--         pocitani queue-->
-        {script $i = 0}
-        {foreach $bla in $queue}
-        {script $i++}
-        {/foreach}
-<!----------------------------------------------------------->
 
-
-<!----------------------------------------------------------->
-<!--            vypisovani Q-->
-        {if $i<>1}
-        Jste {echo $i}. v pořadí
+        <!----------------------------------------------------------->
+        <!--            vypisovani Q-->
+        {if $queuecount != 0}
+        Jste {echo $queuecount}. v pořadí
         počkejte pár dní než předchozí uchazeč ukončí konverzaci.
-    
         {/if}
-<!----------------------------------------------------------->       
-<!--                    vypisovani zprav-->
-        {if $i<2}
+        <!----------------------------------------------------------->       
+        <!--                    vypisovani zprav-->
+        {else}
         <div class="messageWrapper">
             {foreach $k in $vypiskonverzace}
 
@@ -47,25 +38,25 @@
             </div>
             {/foreach}        
         </div>
+        {/else}
+
     </div>
+
+    {if $queuecount == 0}
+    <div class="chatInputs">
+        <form id="inputForm" method="post" action="/submitChat">
+
+            {if isset($error)}
+            <span class="error">
+                {echo $error}
+            </span>
+            {/if}
+            
+            <br/>
+            <input type="text" name="chatTextInput" class="chatTextInput" required/>
+            <input type="submit" name="chatTextSubmit" value="Odeslat" />
+        </form>
+    </div>
+    {/if}
+
 </div>
-
-
-
-
-
-
-<div class="chatInputs">
-    <form method="post" action="#">
-        {if isset($errors["chatErrors"])}
-        <span class="error">
-            {echo join("<br/>", $errors["chatErrors"])}
-        </span>
-        {/if}
-        <br/>
-        <input type="text" name="chatTextInput" class="chatTextInput"/>
-        <input type="submit" name="chatTextSubmit" class="chatTextSubmit" value="odeslat"/>
-    </form>
-    
-</div>
-{/if}

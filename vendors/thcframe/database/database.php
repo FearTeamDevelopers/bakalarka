@@ -33,7 +33,7 @@ class Database extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -43,41 +43,33 @@ class Database extends Base
      */
     public function initialize()
     {
-        Events::fire("framework.database.initialize.before", array($this->type, $this->options));
+        Events::fire('framework.database.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
-            $configuration = Registry::get("configuration");
+            $configuration = Registry::get('config');
 
-            if ($configuration) {
-                $configuration = $configuration->initialize();
-
-                if (DEBUG) {
-                    $parsed = $configuration->parse("configuration/config_dev");
-                } else {
-                    $parsed = $configuration->parse("configuration/config");
-                }
-
-                if (!empty($parsed->database->default) && !empty($parsed->database->default->type)) {
-                    $this->type = $parsed->database->default->type;
-                    unset($parsed->database->default->type);
-                    $this->options = (array) $parsed->database->default;
-                }
+            if (!empty($configuration->database->default) && !empty($configuration->database->default->type)) {
+                $this->type = $configuration->database->default->type;
+                unset($configuration->database->default->type);
+                $this->options = (array) $configuration->database->default;
+            } else {
+                throw new \Exception('Error in configuration file');
             }
         }
 
         if (!$this->type) {
-            throw new Exception\Argument("Invalid type");
+            throw new Exception\Argument('Invalid type');
         }
 
-        Events::fire("framework.database.initialize.after", array($this->type, $this->options));
+        Events::fire('framework.database.initialize.after', array($this->type, $this->options));
 
         switch ($this->type) {
-            case "mysql": {
+            case 'mysql': {
                     return new Connector\Mysql($this->options);
                     break;
                 }
             default: {
-                    throw new Exception\Argument("Invalid type");
+                    throw new Exception\Argument('Invalid type');
                     break;
                 }
         }

@@ -38,17 +38,17 @@ class Mysql extends Database\Connector
     /**
      * @readwrite
      */
-    protected $_port = "3306";
+    protected $_port = '3306';
 
     /**
      * @readwrite
      */
-    protected $_charset = "utf8";
+    protected $_charset = 'utf8';
 
     /**
      * @readwrite
      */
-    protected $_engine = "InnoDB";
+    protected $_engine = 'InnoDB';
 
     /**
      * @readwrite
@@ -74,7 +74,7 @@ class Mysql extends Database\Connector
         parent::__construct($options);
 
         $this->_magicQuotesActive = get_magic_quotes_gpc();
-        $this->_realEscapeStringExists = function_exists("mysqli_real_escape_string");
+        $this->_realEscapeStringExists = function_exists('mysqli_real_escape_string');
     }
 
     /**
@@ -105,10 +105,10 @@ class Mysql extends Database\Connector
             );
 
             if ($this->_service->connect_error) {
-                throw new Exception\Service("Unable to connect to database service");
+                throw new Exception\Service('Unable to connect to database service');
             }
 
-            $this->_service->set_charset("utf8");
+            $this->_service->set_charset('utf8');
             $this->isConnected = true;
             unset($this->_password);
         }
@@ -137,7 +137,7 @@ class Mysql extends Database\Connector
     public function query()
     {
         return new Database\Query\Mysql(array(
-            "connector" => $this
+            'connector' => $this
         ));
     }
 
@@ -150,7 +150,7 @@ class Mysql extends Database\Connector
     public function execute($sql)
     {
         if (!$this->_isValidService()) {
-            throw new Exception\Service("Not connected to a valid database service");
+            throw new Exception\Service('Not connected to a valid database service');
         }
 
         $args = func_get_args();
@@ -160,7 +160,7 @@ class Mysql extends Database\Connector
         }
 
         if (!$stmt = $this->_service->prepare($sql)) {
-            throw new Exception\Sql(sprintf("There was an error in the query %s", $this->_service->error));
+            throw new Exception\Sql(sprintf('There was an error in the query %s', $this->_service->error));
         }
 
         array_shift($args); //remove sql from args
@@ -171,7 +171,7 @@ class Mysql extends Database\Connector
             $bindParamsReferences[$key] = &$args[$key];
         }
 
-        $types = str_repeat("s", count($args)); //all params are strings, works well on MySQL and SQLite
+        $types = str_repeat('s', count($args)); //all params are strings, works well on MySQL and SQLite
         array_unshift($bindParamsReferences, $types);
 
         $bindParamsMethod = new \ReflectionMethod('mysqli_stmt', 'bind_param');
@@ -217,7 +217,7 @@ class Mysql extends Database\Connector
     public function escape($value)
     {
         if (!$this->_isValidService()) {
-            throw new Exception\Service("Not connected to a valid database service");
+            throw new Exception\Service('Not connected to a valid database service');
         }
 
         if ($this->realEscapeStringExists) {
@@ -242,7 +242,7 @@ class Mysql extends Database\Connector
     public function getLastInsertId()
     {
         if (!$this->_isValidService()) {
-            throw new Exception\Service("Not connected to a valid database service");
+            throw new Exception\Service('Not connected to a valid database service');
         }
 
         return $this->_service->insert_id;
@@ -256,7 +256,7 @@ class Mysql extends Database\Connector
     public function getAffectedRows()
     {
         if (!$this->_isValidService()) {
-            throw new Exception\Service("Not connected to a valid database service");
+            throw new Exception\Service('Not connected to a valid database service');
         }
 
         return $this->_service->affected_rows;
@@ -270,7 +270,7 @@ class Mysql extends Database\Connector
     public function getLastError()
     {
         if (!$this->_isValidService()) {
-            throw new Exception\Service("Not connected to a valid database service");
+            throw new Exception\Service('Not connected to a valid database service');
         }
 
         return $this->_service->error;
@@ -321,30 +321,30 @@ class Mysql extends Database\Connector
         $lines = array();
         $indices = array();
         $columns = $model->columns;
-        $template = "CREATE TABLE `%s` (\n%s,\n%s\n) ENGINE=%s DEFAULT CHARSET=%s;";
+        $template = 'CREATE TABLE `%s` (\n%s,\n%s\n) ENGINE=%s DEFAULT CHARSET=%s;';
 
         foreach ($columns as $column) {
-            $raw = $column["raw"];
-            $name = $column["name"];
-            $type = $column["type"];
-            $length = $column["length"];
+            $raw = $column['raw'];
+            $name = $column['name'];
+            $type = $column['type'];
+            $length = $column['length'];
 
-            if ($column["primary"]) {
+            if ($column['primary']) {
                 $indices[] = "PRIMARY KEY (`{$name}`)";
             }
-            if ($column["index"]) {
+            if ($column['index']) {
                 $indices[] = "KEY `ix_{$name}` (`{$name}`)";
             }
-            if ($column["unique"]) {
+            if ($column['unique']) {
                 $indices[] = "UNIQUE KEY (`{$name}`)";
             }
 
             switch ($type) {
-                case "auto_increment": {
+                case 'auto_increment': {
                         $lines[] = "`{$name}` int(11) UNSIGNED NOT NULL AUTO_INCREMENT";
                         break;
                     }
-                case "text": {
+                case 'text': {
                         if ($length !== null && $length <= 255) {
                             $lines[] = "`{$name}` varchar({$length}) NOT NULL DEFAULT ''";
                         } else {
@@ -352,23 +352,23 @@ class Mysql extends Database\Connector
                         }
                         break;
                     }
-                case "integer": {
+                case 'integer': {
                         $lines[] = "`{$name}` int(11) NOT NULL DEFAULT 0";
                         break;
                     }
-                case "tinyint": {
+                case 'tinyint': {
                         $lines[] = "`{$name}` tinyint(4) NOT NULL DEFAULT 0";
                         break;
                     }
-                case "decimal": {
+                case 'decimal': {
                         $lines[] = "`{$name}` float NOT NULL DEFAULT 0.0";
                         break;
                     }
-                case "boolean": {
+                case 'boolean': {
                         $lines[] = "`{$name}` tinyint(4) NOT NULL DEFAULT 0";
                         break;
                     }
-                case "datetime": {
+                case 'datetime': {
                         $lines[] = "`{$name}` datetime DEFAULT NULL";
                         break;
                     }
@@ -377,19 +377,19 @@ class Mysql extends Database\Connector
 
         $table = $model->table;
         $sql = sprintf(
-                $template, $table, join(",\n", $lines), join(",\n", $indices), $this->_engine, $this->_charset
+                $template, $table, join(',\n', $lines), join(',\n', $indices), $this->_engine, $this->_charset
         );
 
         $result = $this->execute("DROP TABLE IF EXISTS {$table};");
         if ($result === false) {
             //$error = $this->lastError;
-            throw new Exception\Sql(sprintf("There was an error in the query"));
+            throw new Exception\Sql(sprintf('There was an error in the query'));
         }
 
         $result2 = $this->execute($sql);
         if ($result2 === false) {
             //$error = $this->lastError;
-            throw new Exception\Sql(sprintf("There was an error in the query"));
+            throw new Exception\Sql(sprintf('There was an error in the query'));
         }
 
         return $this;

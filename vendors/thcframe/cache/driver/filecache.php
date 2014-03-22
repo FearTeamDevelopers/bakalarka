@@ -3,6 +3,7 @@
 namespace THCFrame\Cache\Driver;
 
 use THCFrame\Cache as Cache;
+use THCFrame\Registry\Registry as Registry;
 use THCFrame\Cache\Exception as Exception;
 
 /**
@@ -17,8 +18,8 @@ class Filecache extends Cache\Driver
      * @readwrite
      */
     protected $_duration;
-    protected $_cacheFilePath;
-    protected $_fileSuffix;
+    private $_cacheFilePath;
+    private $_fileSuffix;
 
     /**
      * 
@@ -28,8 +29,14 @@ class Filecache extends Cache\Driver
     {
         parent::__construct($options);
 
-        $this->_cacheFilePath = APP_PATH . "/temp/cache/";
-        $this->_fileSuffix = ".txt";
+        $configuration = Registry::get('config');
+
+        if (!empty($configuration->cache->filecache)) {
+            $this->_cacheFilePath = APP_PATH . '/' . $configuration->cache->filecache->path . '/';
+            $this->_fileSuffix = '.' . $configuration->cache->filecache->suffix;
+        } else {
+            throw new \Exception('Error in configuration file');
+        }
     }
 
     /**
@@ -39,9 +46,9 @@ class Filecache extends Cache\Driver
      */
     public function isFresh($key)
     {
-//        if (DEBUG) {
-//            return false;
-//        }
+        if (ENV == 'dev') {
+            return false;
+        }
 
         if (file_exists($this->_cacheFilePath . $key . $this->_fileSuffix)) {
             if (time() - filemtime($this->_cacheFilePath . $key . $this->_fileSuffix) <= $this->duration) {
@@ -91,7 +98,7 @@ class Filecache extends Cache\Driver
             return;
         }
 
-        throw new Exception\Service(sprintf('Failed to write cache file "%s".', $file));
+        throw new Exception\Service(sprintf('Failed to write cache file %s', $file));
     }
 
     /**

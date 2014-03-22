@@ -32,7 +32,7 @@ class Cache extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -43,51 +43,37 @@ class Cache extends Base
      */
     public function initialize()
     {
-        Events::fire("framework.cache.initialize.before", array($this->type, $this->options));
+        Events::fire('framework.cache.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
-            $configuration = Registry::get("configParsed");
+            $configuration = Registry::get('config');
 
-            if (empty($configuration)) {
-                $configuration = $configuration->initialize();
-
-                if (DEBUG) {
-                    $parsed = $configuration->parse("configuration/config_dev");
-                } else {
-                    $parsed = $configuration->parse("configuration/config");
-                }
-
-                if (!empty($parsed->cache->default) && !empty($parsed->cache->default->type)) {
-                    $this->type = $parsed->cache->default->type;
-                    unset($parsed->cache->default->type);
-                    $this->options = (array) $parsed->cache->default;
-                }
+            if (!empty($configuration->cache->default) && !empty($configuration->cache->default->type)) {
+                $this->type = $configuration->cache->default->type;
+                unset($configuration->cache->default->type);
+                $this->options = (array) $configuration->cache->default;
             } else {
-                if (!empty($configuration->cache->default) && !empty($configuration->cache->default->type)) {
-                    $this->type = $configuration->cache->default->type;
-                    unset($configuration->cache->default->type);
-                    $this->options = (array) $configuration->cache->default;
-                }
+                throw new \Exception('Error in configuration file');
             }
         }
 
         if (!$this->type) {
-            throw new Exception\Argument("Invalid type");
+            throw new Exception\Argument('Invalid type');
         }
 
-        Events::fire("framework.cache.initialize.after", array($this->type, $this->options));
+        Events::fire('framework.cache.initialize.after', array($this->type, $this->options));
 
         switch ($this->type) {
-            case "memcached": {
+            case 'memcached': {
                     return new Driver\Memcached($this->options);
                     break;
                 }
-            case "filecache": {
+            case 'filecache': {
                     return new Driver\Filecache($this->options);
                     break;
                 }
             default: {
-                    throw new Exception\Argument("Invalid type");
+                    throw new Exception\Argument('Invalid type');
                     break;
                 }
         }

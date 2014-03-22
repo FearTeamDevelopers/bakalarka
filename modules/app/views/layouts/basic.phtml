@@ -3,32 +3,31 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta http-equiv="Content-Language" content="cs" />
+        <meta http-equiv="Cache-control" content="no-cache">
         <meta name="viewport" content="width=device-width, maximum-scale=2.0, minimum-scale=1.0, initial-scale=1.0" />
 
         <link href="/public/css/reset.css" media="screen" rel="stylesheet" type="text/css" />
         <link href="/public/css/grid.css" media="screen" rel="stylesheet" type="text/css" />
         <link href="/public/css/smoothness/jquery-ui-1.10.3.custom.min.css" media="screen" rel="stylesheet" type="text/css" />
         <link href="/public/css/styles.css" media="screen" rel="stylesheet" type="text/css" />
-        <link href="/public/css/slides.css" media="screen" rel="stylesheet" type="text/css" />
 
         <!--[if lt IE 9]><script type="text/javascript" src="/public/js/html5.js"></script><![endif]-->
         <script type="text/javascript" src="/public/js/jquery-1.10.2.min.js"></script>
         <script type="text/javascript" src="/public/js/jquery-ui-1.10.3.custom.min.js"></script>
-        <script type="text/javascript" src="/public/js/jquery.slides.min.js"></script>
 
         <title>Den otevřených dveří</title>
     </head>
     <body lang="cs" marginwidth="32" marginheight="0" bgcolor="#f6f5f2" background="/public/images/vosisstredni2.gif" topmargin="0" leftmargin="32">
         <div id="page">
-            
+
             <header id="headerWrapper">
-               {include header.phtml}
+                {include header.phtml}
             </header>
             <div id="contentWrapper">
                 <article id="content">
                     {include content.phtml}
                 </article>
-                
+
                 <div id="chatWrapper">
                     <div class="content">
                         {if !empty($flashMessage)}
@@ -46,14 +45,6 @@
             </div>
 
         </div>
-
-
-
-
-
-
-
-
 
         <script type="text/javascript" src="/public/js/global.js"></script>
 

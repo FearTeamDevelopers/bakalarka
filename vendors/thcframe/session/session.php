@@ -32,7 +32,7 @@ class Session extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -42,47 +42,33 @@ class Session extends Base
      */
     public function initialize()
     {
-        Events::fire("framework.session.initialize.before", array($this->type, $this->options));
+        Events::fire('framework.session.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
-            $configuration = Registry::get("configParsed");
+            $configuration = Registry::get('config');
 
-            if (empty($configuration)) {
-                $configuration = $configuration->initialize();
-
-                if (DEBUG) {
-                    $parsed = $configuration->parse("configuration/config_dev");
-                } else {
-                    $parsed = $configuration->parse("configuration/config");
-                }
-
-                if (!empty($parsed->session->default) && !empty($parsed->session->default->type)) {
-                    $this->type = $parsed->session->default->type;
-                    unset($parsed->session->default->type);
-                    $this->options = (array) $parsed->session->default;
-                }
+            if (!empty($configuration->session->default) && !empty($configuration->session->default->type)) {
+                $this->type = $configuration->session->default->type;
+                unset($configuration->session->default->type);
+                $this->options = (array) $configuration->session->default;
             } else {
-                if (!empty($configuration->session->default) && !empty($configuration->session->default->type)) {
-                    $this->type = $configuration->session->default->type;
-                    unset($configuration->session->default->type);
-                    $this->options = (array) $configuration->session->default;
-                }
+                throw new \Exception('Error in configuration file');
             }
         }
 
         if (!$this->type) {
-            throw new Exception\Argument("Invalid type");
+            throw new Exception\Argument('Invalid type');
         }
 
-        Events::fire("framework.session.initialize.after", array($this->type, $this->options));
+        Events::fire('framework.session.initialize.after', array($this->type, $this->options));
 
         switch ($this->type) {
-            case "server": {
+            case 'server': {
                     return new Driver\Server($this->options);
                     break;
                 }
             default: {
-                    throw new Exception\Argument("Invalid type");
+                    throw new Exception\Argument('Invalid type');
                     break;
                 }
         }

@@ -178,7 +178,7 @@ min-height: 150px;
 }
 .messageWrapper{
     margin:10px;
-     overflow-y:scroll;
+     overflow-y:auto;
      max-height:190px;
 }
 .chatTextInput{ 

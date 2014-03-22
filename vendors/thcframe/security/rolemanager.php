@@ -26,8 +26,8 @@ class RoleManager extends Base
     public function __construct($options = array())
     {
         foreach ($options as $value) {
-            $start = strpos($value, "[");
-            $end = strpos($value, "]");
+            $start = strpos($value, '[');
+            $end = strpos($value, ']');
 
             if ($start) {
                 $role = substr($value, 0, $start);
@@ -37,10 +37,10 @@ class RoleManager extends Base
                 }
 
                 $extend = substr($value, $start + 1, ($end - $start - 1));
-                $extendArr = explode(",", $extend);
+                $extendArr = explode(',', $extend);
                 array_unshift($extendArr, $role);
 
-                $trimedExtendArr = array_map("trim", $extendArr);
+                $trimedExtendArr = array_map('trim', $extendArr);
 
                 $this->_roles[$role] = $trimedExtendArr;
             } else {

@@ -24,14 +24,14 @@ class Mysqldump extends Base
     private $_database;
     private $_mime;
     private $_defaultSettings = array(
-        "include-tables" => array(),
-        "exclude-tables" => array(),
-        "no-data" => false,
-        "add-drop-table" => true,
-        "single-transaction" => true,
-        "lock-tables" => false,
-        "add-locks" => true,
-        "extended-insert" => true
+        'include-tables' => array(),
+        'exclude-tables' => array(),
+        'no-data' => false,
+        'add-drop-table' => true,
+        'single-transaction' => true,
+        'lock-tables' => false,
+        'add-locks' => true,
+        'extended-insert' => true
     );
 
     /**
@@ -42,11 +42,11 @@ class Mysqldump extends Base
      */
     public function __construct($settings = null)
     {
-        $this->_database = Registry::get("database");
+        $this->_database = Registry::get('database');
         $this->_database->connect();
 
         $this->_settings = $this->_extend($this->_defaultSettings, $settings);
-        $this->_filename = APP_PATH . "/temp/" . $this->_database->getSchema() . "_" . date("Y-m-d") . ".sql";
+        $this->_filename = APP_PATH . '/temp/' . $this->_database->getSchema() . '_' . date('Y-m-d') . '.sql';
     }
 
     /**
@@ -57,13 +57,13 @@ class Mysqldump extends Base
     private function _getHeader()
     {
         // Some info about software, source and time
-        $header = "-- mysqldump-php SQL Dump" . PHP_EOL .
-                "--" . PHP_EOL .
-                "-- Host: {$this->_database->getHost()}" . PHP_EOL .
-                "-- Generation Time: " . date("r") . PHP_EOL .
-                "--" . PHP_EOL .
+        $header = '-- mysqldump-php SQL Dump' . PHP_EOL .
+                '--' . PHP_EOL .
+                '-- Host: {$this->_database->getHost()}' . PHP_EOL .
+                '-- Generation Time: ' . date('r') . PHP_EOL .
+                '--' . PHP_EOL .
                 "-- Database: `{$this->_database->getSchema()}`" . PHP_EOL .
-                "--" . PHP_EOL;
+                '--' . PHP_EOL;
         return $header;
     }
 
@@ -78,16 +78,16 @@ class Mysqldump extends Base
         $sqlResult = $this->_database->execute("SHOW CREATE TABLE `$tablename`");
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
-            if (isset($row["Create Table"])) {
+            if (isset($row['Create Table'])) {
                 $this->_write(
-                        "-------------------------------------------------------" . PHP_EOL .
+                        '-------------------------------------------------------' . PHP_EOL .
                         "-- Table structure for table `$tablename` --" . PHP_EOL);
 
-                if ($this->_settings["add-drop-table"]) {
+                if ($this->_settings['add-drop-table']) {
                     $this->_write("DROP TABLE IF EXISTS `$tablename`;" . PHP_EOL);
                 }
 
-                $this->_write($row["Create Table"] . ";" . PHP_EOL);
+                $this->_write($row['Create Table'] . ';' . PHP_EOL);
                 return true;
             }
         }
@@ -101,17 +101,17 @@ class Mysqldump extends Base
      */
     private function _listValues($tablename)
     {
-        $this->_write("--" . PHP_EOL .
+        $this->_write('--' . PHP_EOL .
                 "-- Dumping data for table `$tablename` --" . PHP_EOL);
 
-        if ($this->_settings["single-transaction"]) {
-            //$this->_database->query("SET GLOBAL TRANSACTION ISOLATION LEVEL REPEATABLE READ");
+        if ($this->_settings['single-transaction']) {
+            //$this->_database->query('SET GLOBAL TRANSACTION ISOLATION LEVEL REPEATABLE READ');
             $this->_database->beginTransaction();
         }
-        if ($this->_settings["lock-tables"]) {
+        if ($this->_settings['lock-tables']) {
             $this->_database->execute("LOCK TABLES `$tablename` READ LOCAL");
         }
-        if ($this->_settings["add-locks"]) {
+        if ($this->_settings['add-locks']) {
             $this->_write("LOCK TABLES `$tablename` WRITE;" . PHP_EOL);
         }
 
@@ -122,10 +122,10 @@ class Mysqldump extends Base
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
             $vals = array();
             foreach ($row as $val) {
-                $vals[] = is_null($val) ? "NULL" : "{$val}";
+                $vals[] = is_null($val) ? 'NULL' : "{$val}";
             }
 
-            if ($onlyOnce || !$this->_settings["extended-insert"]) {
+            if ($onlyOnce || !$this->_settings['extended-insert']) {
                 $lineSize += $this->_write(html_entity_decode(
                         "INSERT INTO `$tablename` VALUES ('" . implode("', '", $vals) . "')"));
                 $onlyOnce = false;
@@ -133,23 +133,23 @@ class Mysqldump extends Base
                 $lineSize += $this->_write(html_entity_decode(",('" . implode("', '", $vals) . "')"));
             }
 
-            if (($lineSize > Mysqldump::MAXLINESIZE) || !$this->_settings["extended-insert"]) {
+            if (($lineSize > Mysqldump::MAXLINESIZE) || !$this->_settings['extended-insert']) {
                 $onlyOnce = true;
-                $lineSize = $this->_write(";" . PHP_EOL);
+                $lineSize = $this->_write(';' . PHP_EOL);
             }
         }
 
         if (!$onlyOnce) {
-            $this->_write(";" . PHP_EOL);
+            $this->_write(';' . PHP_EOL);
         }
-        if ($this->_settings["add-locks"]) {
-            $this->_write("UNLOCK TABLES;" . PHP_EOL);
+        if ($this->_settings['add-locks']) {
+            $this->_write('UNLOCK TABLES;' . PHP_EOL);
         }
-        if ($this->_settings["single-transaction"]) {
+        if ($this->_settings['single-transaction']) {
             $this->_database->commitTransaction();
         }
-        if ($this->_settings["lock-tables"]) {
-            $this->_database->execute("UNLOCK TABLES");
+        if ($this->_settings['lock-tables']) {
+            $this->_database->execute('UNLOCK TABLES');
         }
 
         return;
@@ -185,7 +185,7 @@ class Mysqldump extends Base
      */
     private function _open($filename)
     {
-        $this->_fileHandler = fopen($filename, "wb");
+        $this->_fileHandler = fopen($filename, 'wb');
 
         if (false === $this->_fileHandler) {
             return false;
@@ -204,7 +204,7 @@ class Mysqldump extends Base
     {
         $bytesWritten = 0;
         if (false === ($bytesWritten = fwrite($this->_fileHandler, $str))) {
-            throw new Exception\Backup("Writting to file failed!", 4);
+            throw new Exception\Backup('Writting to file failed!', 4);
         }
         return $bytesWritten;
     }
@@ -225,47 +225,47 @@ class Mysqldump extends Base
      * @param string $filename
      * @throws \Exception
      */
-    public function create($filename = "")
+    public function create($filename = '')
     {
         if (!empty($filename)) {
             $this->_filename = $filename;
         }
 
         if (empty($this->_filename)) {
-            throw new Exception\Backup("Output file name is not set", 1);
+            throw new Exception\Backup('Output file name is not set', 1);
         }
 
         if (!$this->_open($this->_filename)) {
-            throw new Exception\Backup(sprintf("Output file %s is not writable", $this->_filename), 2);
+            throw new Exception\Backup(sprintf('Output file %s is not writable', $this->_filename), 2);
         }
 
-        Events::fire("framework.mysqldump.create.before", array($this->_filename));
+        Events::fire('framework.mysqldump.create.before', array($this->_filename));
 
         $this->_write($this->_getHeader());
         $this->_tables = array();
 
-        $sqlResult = $this->_database->execute("SHOW TABLES");
+        $sqlResult = $this->_database->execute('SHOW TABLES');
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
-            if (empty($this->_settings["include-tables"]) ||
-                    (!empty($this->_settings["include-tables"]) &&
-                    in_array($row["Tables_in_" . $this->_database->getSchema()], $this->_settings["include-tables"], true))) {
-                array_push($this->_tables, $row["Tables_in_" . $this->_database->getSchema()]);
+            if (empty($this->_settings['include-tables']) ||
+                    (!empty($this->_settings['include-tables']) &&
+                    in_array($row['Tables_in_' . $this->_database->getSchema()], $this->_settings['include-tables'], true))) {
+                array_push($this->_tables, $row['Tables_in_' . $this->_database->getSchema()]);
             }
         }
 
         // Exporting tables one by one
         foreach ($this->_tables as $table) {
-            if (in_array($table, $this->_settings["exclude-tables"], true)) {
+            if (in_array($table, $this->_settings['exclude-tables'], true)) {
                 continue;
             }
             $is_table = $this->_getTableStructure($table);
-            if (true === $is_table && false === $this->_settings["no-data"]) {
+            if (true === $is_table && false === $this->_settings['no-data']) {
                 $this->_listValues($table);
             }
         }
 
-        Events::fire("framework.mysqldump.create.after", array($this->_filename));
+        Events::fire('framework.mysqldump.create.after', array($this->_filename));
 
         $this->_close();
     }
@@ -275,16 +275,16 @@ class Mysqldump extends Base
      */
     public function downloadDump()
     {
-        $this->_mime = "text/x-sql";
+        $this->_mime = 'text/x-sql';
 
-        header("Pragma: public");
-        header("Expires: 0");
-        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-        header("Cache-Control: private", false);
-        header("Content-Type: " . $this->_mime);
+        header('Pragma: public');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Cache-Control: private', false);
+        header('Content-Type: ' . $this->_mime);
         header("Content-Disposition: attachment; filename='" . basename($this->_filename) . "'");
-        header("Content-Transfer-Encoding: binary");
-        header("Content-Length: " . filesize($this->_filename));
+        header('Content-Transfer-Encoding: binary');
+        header('Content-Length: ' . filesize($this->_filename));
         ob_clean();
         flush();
         readfile($this->_filename);

@@ -13,7 +13,12 @@ use THCFrame\Configuration\Exception as Exception;
 abstract class Driver extends Base
 {
 
-    protected $_parsed = array();
+    protected $_parsed;
+    
+    /**
+     * @readwrite
+     */
+    protected $_env;
 
     /**
      * 
@@ -31,7 +36,7 @@ abstract class Driver extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
 }

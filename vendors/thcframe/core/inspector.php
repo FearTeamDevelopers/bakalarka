@@ -15,9 +15,9 @@ class Inspector
 
     protected $_class;
     protected $_meta = array(
-        "class" => array(),
-        "properties" => array(),
-        "methods" => array()
+        'class' => array(),
+        'properties' => array(),
+        'methods' => array()
     );
     protected $_properties = array();
     protected $_methods = array();
@@ -91,14 +91,14 @@ class Inspector
     protected function _parse($comment)
     {
         $meta = array();
-        $pattern = "(@[a-zA-Z]+\s*[a-zA-Z0-9, ()_]*)";
+        $pattern = '(@[a-zA-Z]+\s*[a-zA-Z0-9, ()_]*)';
         $matches = StringMethods::match($comment, $pattern);
 
         if ($matches != null) {
             foreach ($matches as $match) {
                 $parts = ArrayMethods::clean(
                                 ArrayMethods::trim(
-                                        StringMethods::split($match, "[\s]", 2)
+                                        StringMethods::split($match, '[\s]', 2)
                                 )
                 );
 
@@ -107,7 +107,7 @@ class Inspector
                 if (count($parts) > 1) {
                     $meta[$parts[0]] = ArrayMethods::clean(
                                     ArrayMethods::trim(
-                                            StringMethods::split($parts[1], ",")
+                                            StringMethods::split($parts[1], ',')
                                     )
                     );
                 }
@@ -123,17 +123,17 @@ class Inspector
      */
     public function getClassMeta()
     {
-        if (!isset($_meta["class"])) {
+        if (!isset($_meta['class'])) {
             $comment = $this->_getClassComment();
 
             if (!empty($comment)) {
-                $_meta["class"] = $this->_parse($comment);
+                $_meta['class'] = $this->_parse($comment);
             } else {
-                $_meta["class"] = null;
+                $_meta['class'] = null;
             }
         }
 
-        return $_meta["class"];
+        return $_meta['class'];
     }
 
     /**
@@ -177,17 +177,17 @@ class Inspector
      */
     public function getPropertyMeta($property)
     {
-        if (!isset($_meta["properties"][$property])) {
+        if (!isset($_meta['properties'][$property])) {
             $comment = $this->_getPropertyComment($property);
 
             if (!empty($comment)) {
-                $_meta["properties"][$property] = $this->_parse($comment);
+                $_meta['properties'][$property] = $this->_parse($comment);
             } else {
-                $_meta["properties"][$property] = null;
+                $_meta['properties'][$property] = null;
             }
         }
 
-        return $_meta["properties"][$property];
+        return $_meta['properties'][$property];
     }
 
     /**
@@ -197,17 +197,17 @@ class Inspector
      */
     public function getMethodMeta($method)
     {
-        if (!isset($_meta["methods"][$method])) {
+        if (!isset($_meta['methods'][$method])) {
             $comment = $this->_getMethodComment($method);
 
             if (!empty($comment)) {
-                $_meta["methods"][$method] = $this->_parse($comment);
+                $_meta['methods'][$method] = $this->_parse($comment);
             } else {
-                $_meta["methods"][$method] = null;
+                $_meta['methods'][$method] = null;
             }
         }
 
-        return $_meta["methods"][$method];
+        return $_meta['methods'][$method];
     }
 
 }

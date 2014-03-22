@@ -15,6 +15,81 @@ use THCFrame\Configuration\Exception as Exception;
 class Ini extends Configuration\Driver
 {
 
+    private $_defaultConfig;
+
+    /**
+     * 
+     * @param type $options
+     */
+    public function __construct($options = array())
+    {
+        parent::__construct($options);
+
+        $this->parseDefault('./vendors/thcframe/configuration/default/defaultConfig.ini');
+
+        switch ($this->getEnv()) {
+            case 'dev': {
+                    $this->parse('./application/configuration/config_dev.ini');
+                    break;
+                }
+            case 'qa': {
+                    $this->parse('./application/configuration/config_qa.ini');
+                    break;
+                }
+            case 'live': {
+                    $this->parse('./application/configuration/config_live.ini');
+                    break;
+                }
+        }
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    private function mergeConfiguration()
+    {
+        $merged = $this->_defaultConfig;
+
+        foreach ($this->_parsed as $key => $value) {
+            $merged[$key] = array_merge($this->_defaultConfig[$key], $this->_parsed[$key]);
+        }
+
+        return $merged;
+    }
+
+    /**
+     * 
+     * @param type $path
+     */
+    protected function parseDefault($path)
+    {
+        if (empty($path)) {
+            throw new Exception\Argument('Path argument is not valid');
+        }
+
+        if (!isset($this->_defaultConfig)) {
+            $config = array();
+
+            ob_start();
+            include($path);
+            $string = ob_get_contents();
+            ob_end_clean();
+
+            $pairs = parse_ini_string($string);
+
+            if ($pairs == false) {
+                throw new Exception\Syntax('Could not parse configuration file');
+            }
+
+            foreach ($pairs as $key => $value) {
+                $config = $this->_pair($config, $key, $value);
+            }
+
+            $this->_defaultConfig = $config;
+        }
+    }
+
     /**
      * 
      * @param type $config
@@ -24,8 +99,8 @@ class Ini extends Configuration\Driver
      */
     protected function _pair($config, $key, $value)
     {
-        if (strstr($key, ".")) {
-            $parts = explode(".", $key, 2);
+        if (strstr($key, '.')) {
+            $parts = explode('.', $key, 2);
 
             if (empty($config[$parts[0]])) {
                 $config[$parts[0]] = array();
@@ -49,33 +124,37 @@ class Ini extends Configuration\Driver
     public function parse($path)
     {
         if (empty($path)) {
-            throw new Exception\Argument("\$path argument is not valid");
+            throw new Exception\Argument('Path argument is not valid');
         }
 
-        if (!isset($this->_parsed[$path])) {
+        if (!isset($this->_parsed)) {
             $config = array();
 
             ob_start();
-            include("./application/{$path}.ini");
+            include($path);
             $string = ob_get_contents();
             ob_end_clean();
 
             $pairs = parse_ini_string($string);
 
             if ($pairs == false) {
-                throw new Exception\Syntax("Could not parse configuration file");
+                throw new Exception\Syntax('Could not parse configuration file');
             }
 
             foreach ($pairs as $key => $value) {
                 $config = $this->_pair($config, $key, $value);
             }
 
-            $this->_parsed[$path] = ArrayMethods::toObject($config);
+            $this->_parsed = $config;
         }
 
-        Registry::set("configParsed", $this->_parsed[$path]);
+        $merged = $this->mergeConfiguration();
+        $configObject = ArrayMethods::toObject($merged);
 
-        return $this->_parsed[$path];
+        Registry::set('config', $configObject);
+        Registry::set('dateformat', $configObject->system->default->dateformat);
+
+        return $configObject;
     }
 
 }

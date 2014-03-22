@@ -50,22 +50,22 @@ class Controller extends Base
     /**
      * @readwrite
      */
-    protected $_defaultPath = "modules/%s/views";
+    protected $_defaultPath = 'modules/%s/views';
 
     /**
      * @readwrite
      */
-    protected $_defaultLayout = "layouts/basic";
+    protected $_defaultLayout = 'layouts/basic';
 
     /**
      * @readwrite
      */
-    protected $_defaultExtension = "phtml";
+    protected $_defaultExtension = 'phtml';
 
     /**
      * @readwrite
      */
-    protected $_defaultContentType = "text/html";
+    protected $_defaultContentType = 'text/html';
 
     /**
      * 
@@ -86,7 +86,7 @@ class Controller extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -112,33 +112,19 @@ class Controller extends Base
     {
         parent::__construct($options);
 
-        Events::fire("framework.controller.construct.before", array($this->name));
+        Events::fire('framework.controller.construct.before', array($this->name));
 
-        $configuration = Registry::get("configParsed");
+        $configuration = Registry::get('config');
 
-        if (empty($configuration)) {
-            $configuration = $configuration->initialize();
-
-            if (DEBUG) {
-                $parsed = $configuration->parse("configuration/config_dev");
-            } else {
-                $parsed = $configuration->parse("configuration/config");
-            }
-
-            if (!empty($parsed->view->default)) {
-                $this->defaultExtension = $parsed->view->default->extension;
-                $this->defaultLayout = $parsed->view->default->layout;
-                $this->defaultPath = $parsed->view->default->path;
-            }
+        if (!empty($configuration->view->default)) {
+            $this->defaultExtension = $configuration->view->default->extension;
+            $this->defaultLayout = $configuration->view->default->layout;
+            $this->defaultPath = $configuration->view->default->path;
         } else {
-            if (!empty($configuration->view->default)) {
-                $this->defaultExtension = $configuration->view->default->extension;
-                $this->defaultLayout = $configuration->view->default->layout;
-                $this->defaultPath = $configuration->view->default->path;
-            }
+            throw new \Exception('Error in configuration file');
         }
 
-        $router = Registry::get("router");
+        $router = Registry::get('router');
         $module = $router->getLastRoute()->getModule();
         $controller = $router->getLastRoute()->getController();
         $action = $router->getLastRoute()->getAction();
@@ -149,7 +135,7 @@ class Controller extends Base
 
         if ($this->willRenderLayoutView) {
             $view = new View(array(
-                "file" => APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$defaultExtension}"
+                'file' => APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$defaultExtension}"
             ));
 
             $this->layoutView = $view;
@@ -157,13 +143,13 @@ class Controller extends Base
 
         if ($this->willRenderActionView) {
             $view = new View(array(
-                "file" => APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$defaultExtension}"
+                'file' => APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$defaultExtension}"
             ));
 
             $this->actionView = $view;
         }
 
-        Events::fire("framework.controller.construct.after", array($this->name));
+        Events::fire('framework.controller.construct.after', array($this->name));
     }
 
     /**
@@ -172,13 +158,13 @@ class Controller extends Base
      */
     public function getModel($model, $options = NULL)
     {
-        list($module, $modelName) = explode("/", $model);
+        list($module, $modelName) = explode('/', $model);
 
-        if ($module == "" || $modelName == "") {
-            throw new Exception\Model(sprintf("%s is not valid model name", $model));
+        if ($module == '' || $modelName == '') {
+            throw new Exception\Model(sprintf('%s is not valid model name', $model));
         } else {
             $fileName = APP_PATH . strtolower("/modules/{$module}/model/{$modelName}.php");
-            $className = ucfirst($module) . "_Model_" . ucfirst($modelName);
+            $className = ucfirst($module) . '_Model_' . ucfirst($modelName);
 
             if (file_exists($fileName)) {
                 if (NULL !== $options) {
@@ -196,7 +182,7 @@ class Controller extends Base
      */
     public function render()
     {
-        Events::fire("framework.controller.render.before", array($this->name));
+        Events::fire('framework.controller.render.before', array($this->name));
 
         $defaultContentType = $this->defaultContentType;
         $results = null;
@@ -212,7 +198,7 @@ class Controller extends Base
                 $this->actionView
                         ->template
                         ->implementation
-                        ->set("action", $results);
+                        ->set('action', $results);
             }
 
             if ($doLayout) {
@@ -229,10 +215,10 @@ class Controller extends Base
             $this->willRenderLayoutView = false;
             $this->willRenderActionView = false;
         } catch (\Exception $e) {
-            throw new ViewException\Renderer("Invalid layout/template syntax");
+            throw new ViewException\Renderer('Invalid layout/template syntax');
         }
 
-        Events::fire("framework.controller.render.after", array($this->name));
+        Events::fire('framework.controller.render.after', array($this->name));
     }
 
     /**
@@ -240,11 +226,11 @@ class Controller extends Base
      */
     public function __destruct()
     {
-        Events::fire("framework.controller.destruct.before", array($this->name));
+        Events::fire('framework.controller.destruct.before', array($this->name));
 
         $this->render();
 
-        Events::fire("framework.controller.destruct.after", array($this->name));
+        Events::fire('framework.controller.destruct.after', array($this->name));
     }
 
 }

@@ -13,7 +13,7 @@ use THCFrame\Security\RoleManager;
 /**
  * Description of Security
  *
- * @author Tomy 
+ * @author Tomy
  */
 class Security extends Base
 {
@@ -35,7 +35,7 @@ class Security extends Base
      * @var type 
      */
     protected $_loginCredentials = array();
-    
+
     /**
      * @read
      * @var type 
@@ -61,7 +61,7 @@ class Security extends Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -69,44 +69,30 @@ class Security extends Base
      */
     public function initialize()
     {
-        Events::fire("framework.security.initialize.before", array($this->type));
+        Events::fire('framework.security.initialize.before', array($this->type));
 
-        $configuration = Registry::get("configParsed");
+        $configuration = Registry::get('config');
 
-        if (empty($configuration)) {
-            $configuration = $configuration->initialize();
-
-            if (DEBUG) {
-                $parsed = $configuration->parse("configuration/config_dev");
-            } else {
-                $parsed = $configuration->parse("configuration/config");
-            }
-
-            if (!empty($parsed->security->default)) {
-                $rolesOptions = (array) $parsed->security->default->roles;
-                $this->_loginCredentials = (array) $parsed->security->default->loginCredentials;
-                $this->_passwordEncoder = $parsed->security->default->encoder;
-            }
+        if (!empty($configuration->security->default)) {
+            $rolesOptions = (array) $configuration->security->default->roles;
+            $this->_loginCredentials = (array) $configuration->security->default->loginCredentials;
+            $this->_passwordEncoder = $configuration->security->default->encoder;
         } else {
-            if (!empty($configuration->security->default)) {
-                $rolesOptions = (array) $configuration->security->default->roles;
-                $this->_loginCredentials = (array) $configuration->security->default->loginCredentials;
-                $this->_passwordEncoder = $configuration->security->default->encoder;
-            }
+            throw new \Exception('Error in configuration file');
         }
 
         $this->_roleManager = new RoleManager($rolesOptions);
 
-        $session = Registry::get("session");
-        $user = $session->get("authUser");
+        $session = Registry::get('session');
+        $user = $session->get('authUser');
 
         if ($user) {
             $this->_user = $user;
             $this->_authenticated = true;
-            Events::fire("framework.security.initialize.user", array($user));
+            Events::fire('framework.security.initialize.user', array($user));
         }
 
-        Events::fire("framework.security.initialize.after", array($this->type));
+        Events::fire('framework.security.initialize.after', array($this->type));
 
         return $this;
     }
@@ -119,9 +105,9 @@ class Security extends Base
     {
         @session_regenerate_id();
 
-        $session = Registry::get("session");
-        $session->set("authUser", $user)
-                ->set("lastActive", time());
+        $session = Registry::get('session');
+        $session->set('authUser', $user)
+                ->set('lastActive', time());
 
         $this->_user = $user;
     }
@@ -140,9 +126,9 @@ class Security extends Base
      */
     public function logout()
     {
-        $session = Registry::get("session");
-        $session->erase("authUser")
-                ->erase("lastActive");
+        $session = Registry::get('session');
+        $session->erase('authUser')
+                ->erase('lastActive');
 
         $this->_user = NULL;
         $this->_authenticated = false;
@@ -157,13 +143,13 @@ class Security extends Base
      */
     public function getHash($value)
     {
-        if ($value == "") {
-            return "";
+        if ($value == '') {
+            return '';
         } else {
             if (in_array($this->_passwordEncoder, hash_algos())) {
                 return hash($this->_passwordEncoder, $value);
             } else {
-                throw new Exception\HashAlgorithm(sprintf("Hash algorithm %s is not supported", $this->_passwordEncoder));
+                throw new Exception\HashAlgorithm(sprintf('Hash algorithm %s is not supported', $this->_passwordEncoder));
             }
         }
     }
@@ -179,7 +165,7 @@ class Security extends Base
         if ($this->_user) {
             $userRole = strtolower($this->_user->getRole());
         } else {
-            $userRole = "role_host";
+            $userRole = 'role_host';
         }
 
         $requiredRole = strtolower(trim($requiredRole));
@@ -229,23 +215,23 @@ class Security extends Base
         $hash = $this->getHash($password);
 
         $user = \App_Model_User::first(array(
-                    "{$this->_loginCredentials["login"]} = ?" => $loginCredential,
-                    "{$this->_loginCredentials["pass"]} = ?" => $hash
+                    "{$this->_loginCredentials['login']} = ?" => $loginCredential,
+                    "{$this->_loginCredentials['pass']} = ?" => $hash
         ));
-        
+
         if (NULL !== $user) {
             if ($user instanceof AdvancedUserInterface) {
                 if (!$user->isActive()) {
-                    $message = "User account is not active";
-                    Events::fire("framework.security.authenticate.failure", array($user, $message));
+                    $message = 'User account is not active';
+                    Events::fire('framework.security.authenticate.failure', array($user, $message));
                     throw new Exception\UserInactive($message);
                 } elseif ($user->isExpired()) {
-                    $message = "User account has expired";
-                    Events::fire("framework.security.authenticate.failure", array($user, $message));
+                    $message = 'User account has expired';
+                    Events::fire('framework.security.authenticate.failure', array($user, $message));
                     throw new Exception\UserExpired($message);
                 } elseif ($user->isPassExpired()) {
-                    $message = "User password has expired";
-                    Events::fire("framework.security.authenticate.failure", array($user, $message));
+                    $message = 'User password has expired';
+                    Events::fire('framework.security.authenticate.failure', array($user, $message));
                     throw new Exception\UserPassExpired($message);
                 } else {
                     $user->setLastLogin();
@@ -255,47 +241,47 @@ class Security extends Base
                     $this->setUser($user);
 
                     if ($admin) {
-                        if ($this->isGranted("role_admin")) {
-                            Events::fire("framework.security.authenticate.success", array($user));
+                        if ($this->isGranted('role_admin')) {
+                            Events::fire('framework.security.authenticate.success', array($user));
                             return true;
                         } else {
-                            $message = "You dont have permission to access required content";
-                            Events::fire("framework.security.authenticate.failure", array($user, $message));
+                            $message = 'You dont have permission to access required content';
+                            Events::fire('framework.security.authenticate.failure', array($user, $message));
                             $this->logout();
                             throw new Exception\Unauthorized($message);
                         }
                     } else {
-                        Events::fire("framework.security.authenticate.success", array($user));
+                        Events::fire('framework.security.authenticate.success', array($user));
                         return true;
                     }
                 }
             } elseif ($user instanceof UserInterface) {
 
                 if (!$user->isActive()) {
-                    $message = "User account is not active";
-                    Events::fire("framework.security.authenticate.failure", array($user, $message));
+                    $message = 'User account is not active';
+                    Events::fire('framework.security.authenticate.failure', array($user, $message));
                     throw new Exception\UserInactive($message);
                 } else {
                     $this->_authenticated = true;
                     $this->setUser($user);
 
                     if ($admin) {
-                        if ($this->isGranted("role_admin")) {
-                            Events::fire("framework.security.authenticate.success", array($user));
+                        if ($this->isGranted('role_admin')) {
+                            Events::fire('framework.security.authenticate.success', array($user));
                             return true;
                         } else {
-                            $message = "You dont have permission to access required content";
-                            Events::fire("framework.security.authenticate.failure", array($user, $message));
+                            $message = 'You dont have permission to access required content';
+                            Events::fire('framework.security.authenticate.failure', array($user, $message));
                             $this->logout();
                             throw new Exception\Unauthorized($message);
                         }
                     } else {
-                        Events::fire("framework.security.authenticate.success", array($user));
+                        Events::fire('framework.security.authenticate.success', array($user));
                         return true;
                     }
                 }
             } else {
-                throw new Exception\Implementation(sprintf("%s is not implementing UserInterface", get_class($user)));
+                throw new Exception\Implementation(sprintf('%s is not implementing UserInterface', get_class($user)));
             }
         } else {
             return false;

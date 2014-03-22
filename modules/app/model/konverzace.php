@@ -36,6 +36,8 @@ class App_Model_Konverzace extends Model implements UserInterface {
      * @lenght 150
      * @type text
      * @label message
+     * 
+     * @validate required, alphanumeric
      */
     protected $_message;
     

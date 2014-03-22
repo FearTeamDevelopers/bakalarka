@@ -22,7 +22,8 @@ class App_Model_Queue extends Model implements UserInterface {
      * @column
      * @readwrite
      * @type integer
-     * lenght 11
+     * 
+     * @validate max(8)
      */
     protected $_idAdmin;
 
@@ -30,11 +31,18 @@ class App_Model_Queue extends Model implements UserInterface {
      * @column
      * @readwrite
      * @type integer
-     * lenght 11
-
+     * 
+     * @validate max(8)
      */
     protected $_idUser;
 
+    /**
+     * @column
+     * @readwrite
+     * @type boolean
+     */
+    protected $_active;
+    
     /**
      * @column
      * @readwrite
@@ -48,6 +56,7 @@ class App_Model_Queue extends Model implements UserInterface {
      * @type datetime
      */
     protected $_modified;
+    
 public function isActive() {
     }
 }

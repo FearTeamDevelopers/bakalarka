@@ -25,7 +25,7 @@ class Base
      */
     protected function _getReadonlyException($property)
     {
-        return new Exception\ReadOnly(sprintf("%s is read-only", $property));
+        return new Exception\ReadOnly(sprintf('%s is read-only', $property));
     }
 
     /**
@@ -35,7 +35,7 @@ class Base
      */
     protected function _getWriteonlyException($property)
     {
-        return new Exception\WriteOnly(sprintf("%s is write-only", $property));
+        return new Exception\WriteOnly(sprintf('%s is write-only', $property));
     }
 
     /**
@@ -44,7 +44,7 @@ class Base
      */
     protected function _getPropertyException()
     {
-        return new Exception\Property("Invalid property");
+        return new Exception\Property('Invalid property');
     }
 
     /**
@@ -54,7 +54,7 @@ class Base
      */
     protected function _getImplementationException($method)
     {
-        return new Exception\Implementation(sprintf("%s method not implemented", $method));
+        return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
     /**
@@ -85,10 +85,10 @@ class Base
     public function __call($name, $arguments)
     {
         if (empty($this->_inspector)) {
-            throw new Exception("Call parent::__construct!");
+            throw new Exception('Call parent::__construct!');
         }
 
-        $getMatches = StringMethods::match($name, "#^get([a-zA-Z0-9_]+)$#");
+        $getMatches = StringMethods::match($name, '#^get([a-zA-Z0-9_]+)$#');
         if (count($getMatches) > 0) {
             $normalized = lcfirst($getMatches[0]);
             $property = "_{$normalized}";
@@ -96,7 +96,7 @@ class Base
             if (property_exists($this, $property)) {
                 $meta = $this->_inspector->getPropertyMeta($property);
 
-                if (empty($meta["@readwrite"]) && empty($meta["@read"])) {
+                if (empty($meta['@readwrite']) && empty($meta['@read'])) {
                     throw $this->_getWriteonlyException($normalized);
                 }
 
@@ -112,7 +112,7 @@ class Base
             }
         }
 
-        $setMatches = StringMethods::match($name, "#^set([a-zA-Z0-9_]+)$#");
+        $setMatches = StringMethods::match($name, '#^set([a-zA-Z0-9_]+)$#');
         if (count($setMatches) > 0) {
             $normalized = lcfirst($setMatches[0]);
             $property = "_{$normalized}";
@@ -120,7 +120,7 @@ class Base
             if (property_exists($this, $property)) {
                 $meta = $this->_inspector->getPropertyMeta($property);
 
-                if (empty($meta["@readwrite"]) && empty($meta["@write"])) {
+                if (empty($meta['@readwrite']) && empty($meta['@write'])) {
                     throw $this->_getReadonlyException($normalized);
                 }
 
@@ -132,7 +132,7 @@ class Base
             }
         }
 
-        $unsetMatches = StringMethods::match($name, "#^uns([a-zA-Z0-9_]+)$#");
+        $unsetMatches = StringMethods::match($name, '#^uns([a-zA-Z0-9_]+)$#');
         if (count($unsetMatches) > 0) {
             $normalized = lcfirst($setMatches[0]);
             $property = "_{$normalized}";
@@ -140,7 +140,7 @@ class Base
             if (property_exists($this, $property)) {
                 $meta = $this->_inspector->getPropertyMeta($property);
 
-                if (empty($meta["@readwrite"]) && empty($meta["@write"])) {
+                if (empty($meta['@readwrite']) && empty($meta['@write'])) {
                     throw $this->_getReadonlyException($normalized);
                 }
 
@@ -163,7 +163,7 @@ class Base
     public function __get($name)
     {
 
-        $function = "get" . ucfirst($name);
+        $function = 'get' . ucfirst($name);
         return $this->$function();
     }
 
@@ -175,7 +175,7 @@ class Base
      */
     public function __set($name, $value)
     {
-        $function = "set" . ucfirst($name);
+        $function = 'set' . ucfirst($name);
         return $this->$function($value);
     }
 
@@ -186,7 +186,7 @@ class Base
      */
     public function __unset($name)
     {
-        $function = "uns" . ucfirst($name);
+        $function = 'uns' . ucfirst($name);
         return $this->$function();
     }
 

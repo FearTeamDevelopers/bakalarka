@@ -18,12 +18,12 @@ class Memcached extends Cache\Driver
     /**
      * @readwrite
      */
-    protected $_host = "127.0.0.1";
+    protected $_host = '127.0.0.1';
 
     /**
      * @readwrite
      */
-    protected $_port = "11211";
+    protected $_port = '11211';
 
     /**
      * @readwrite
@@ -66,7 +66,7 @@ class Memcached extends Cache\Driver
 
             $this->isConnected = true;
         } catch (\Exception $e) {
-            throw new Exception\Service("Unable to connect to service");
+            throw new Exception\Service('Unable to connect to service');
         }
 
         return $this;
@@ -96,7 +96,7 @@ class Memcached extends Cache\Driver
     public function get($key, $default = null)
     {
         if (!$this->_isValidService()) {
-            throw new Exception\Service("Not connected to a valid service");
+            throw new Exception\Service('Not connected to a valid service');
         }
 
         $value = $this->_service->get($key, MEMCACHE_COMPRESSED);
@@ -119,7 +119,7 @@ class Memcached extends Cache\Driver
     public function set($key, $value)
     {
         if (!$this->_isValidService()) {
-            throw new Exception\Service("Not connected to a valid service");
+            throw new Exception\Service('Not connected to a valid service');
         }
 
         $this->_service->set($key, $value, MEMCACHE_COMPRESSED, $this->duration);
@@ -135,10 +135,25 @@ class Memcached extends Cache\Driver
     public function erase($key)
     {
         if (!$this->_isValidService()) {
-            throw new Exception\Service("Not connected to a valid service");
+            throw new Exception\Service('Not connected to a valid service');
         }
 
         $this->_service->delete($key);
+        return $this;
+    }
+
+    /**
+     * 
+     * @return \THCFrame\Cache\Driver\Memcached
+     * @throws Exception\Service
+     */
+    public function clearCache()
+    {
+        if (!$this->_isValidService()) {
+            throw new Exception\Service('Not connected to a valid service');
+        }
+
+        $this->_service->flush();
         return $this;
     }
 

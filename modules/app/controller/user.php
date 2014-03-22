@@ -1,6 +1,6 @@
 <?php
 
-use App\Libraries\Controller as Controller;
+use App\Etc\Controller as Controller;
 use THCFrame\Registry\Registry as Registry;
 use THCFrame\Request\RequestMethods as RequestMethods;
 
@@ -9,61 +9,19 @@ use THCFrame\Request\RequestMethods as RequestMethods;
  *
  * @author Tomy
  */
-class App_Controller_User extends Controller {
+class App_Controller_User extends Controller
+{
 
-    /**
-     * 
-     * @param type $name
-     * @param type $username
-     * @return string
-     * @throws \Exception
-     */
-    private function _upload($name, $user) {
-
-        if (isset($_FILES[$name]) && !empty($_FILES[$name]["name"])) {
-            $file = $_FILES[$name];
-            $path = "/public/uploads/team/";
-
-            $size = filesize($file["tmp_name"]);
-            $extension = pathinfo($file["name"], PATHINFO_EXTENSION);
-            $filename = $user->getEmail() . "_" . $user->getId() . "." . $extension;
-
-            if ($size > 5000000) {
-                throw new \Exception("Image size exceeds the maximum size limit");
-            } elseif (!in_array($extension, self::$_imageExtensions)) {
-                throw new \Exception("Images can only be with jpg, jpeg, png or gif extension");
-            } elseif (file_exists("." . $path . $filename)) {
-                unlink("." . $path . $filename);
-
-                if (move_uploaded_file($file["tmp_name"], "." . $path . $filename)) {
-                    return $path . $filename;
-                } else {
-                    throw new \Exception("An error occured while uploading the photo");
-                }
-            } else {
-                if (move_uploaded_file($file["tmp_name"], "." . $path . $filename)) {
-                    return $path . $filename;
-                } else {
-                    throw new \Exception("An error occured while uploading the photo");
-                }
-            }
-        } else {
-            return "";
-        }
-    }
 
     /**
      * 
      */
-    public function login() {
-
-
+    public function login()
+    {
         if (RequestMethods::post("continue")) {
             $view = $this->getActionView();
-            $security = Registry::get("security");
             $session = Registry::get("session");
             $errors = array();
-
 
             $email = App_Model_User::first(array('email = ?' => RequestMethods::post("email")), array('email'));
 
@@ -79,19 +37,18 @@ class App_Controller_User extends Controller {
                 "created" => date("Y-m-d H:i:s")
             ));
             if (empty($errors) && $user->validate()) {
-
                 $user->save();
-                
-                $session->set("user",$user) ;
-                
-            $queue = new App_Model_Queue(array(
-                "idAdmin" => 1,
-                "idUser" =>$user->getId(),
-                "created" =>date("Y-m-d H:i:s"),
-                "modified" =>date("Y-m-d H:i:s")
-            ));
-            
-            $queue->save();
+                $session->set("user", $user);
+
+                $queue = new App_Model_Queue(array(
+                    "idAdmin" => 1,
+                    "idUser" => $user->getId(),
+                    "created" => date("Y-m-d H:i:s"),
+                    "modified" => date("Y-m-d H:i:s"),
+                    'active' => false
+                ));
+
+                $queue->save();
                 self::redirect("/");
             } else {
                 $view->set("errors", $errors + $user->getErrors());
@@ -102,24 +59,19 @@ class App_Controller_User extends Controller {
     /**
      * 
      */
-    public function logout() {
-        $security = Registry::get("security");
-        $security->logout();
-       
-        self::redirect("/login");
-    }
+    public function logout()
+    {
+        $session = Registry::get('session');
+        $session->erase('user');
 
-    /**
-     * 
-     */
-    public function register() {
-        
+        self::redirect("/login");
     }
 
     /**
      * @before _secured
      */
-    public function edit() {
+    public function edit()
+    {
         $view = $this->getActionView();
         $userId = $this->getUser()->getId();
         $errors = array();
@@ -194,20 +146,5 @@ class App_Controller_User extends Controller {
 
         $view->set("user", $user);
     }
-   private function authenticate($loginCredential)
-    {
-$security = Registry::get("security");
-        $user = \App_Model_User::first(array(
-                    "email = ?" => $loginCredential,
-        ));
-        
-       
-                    $security->_authenticated = true;
-                    $security->setUser($user);
 
-                  
-                        Events::fire("framework.security.authenticate.success", array($user));
-                       
-     
-    }
 }
