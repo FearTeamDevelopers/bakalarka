@@ -235,42 +235,31 @@ class Admin_Controller_User extends Controller {
 
     /**
      * 
-     * @before _secured, _superadmin
-     * @param type $id
+     * @before _secured, _admin
      */
-    public function delete($id) {
+    public function delete() {
         $view = $this->getActionView();
-
-        $user = Admin_Model_User::first(array(
+        $q = App_Model_Queue::first(array(
+            "active = ?" => true
+        ));
+        $id= $q->getIdUser();
+        $user = App_Model_User::first(array(
                     "id = ?" => $id
-                        ), array("id", "firstname", "lastname", "email")
+                        )
         );
 
         if (NULL === $user) {
             $view->flashMessage("User not found");
-            self::redirect("/admin/user/");
+            self::redirect("/admin/");
+        }else{
+            
+            $user->setDeleted(true);
+            $user->save();
+            self::redirect("/admin/");
         }
         
-        $view->set("user", $user);
 
-        if (RequestMethods::post("deleteUser")) {
-            if (NULL !== $user) {
-                $message = "User " . $user->getFirstname() . " " . $user->getLastname() . " has been deleted";
-
-                if (unlink("." . $user->getPhoto()) && $user->delete()) {
-                    $view->flashMessage($message);
-                    self::redirect("/admin/user/");
-                } else {
-                    $view->flashMessage("Unknown error eccured");
-                    self::redirect("/admin/user/");
-                }
-            } else {
-                $view->flashMessage("Unknown id provided");
-                self::redirect("/admin/user/");
-            }
-        } elseif (RequestMethods::post("cancel")) {
-            self::redirect("/admin/user/");
-        }
+  
     }
 
 }

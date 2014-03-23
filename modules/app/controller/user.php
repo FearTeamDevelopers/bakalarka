@@ -62,6 +62,19 @@ class App_Controller_User extends Controller
     public function logout()
     {
         $session = Registry::get('session');
+        $user=$session->get('user');
+        $userId = $user->getId();
+        
+        
+        $bla= App_Model_Queue::first(array(
+            "idUser = ?" =>$userId
+        ));
+        $bla->delete();
+        
+        $blabla=  App_Model_User::first(array(
+            "id = ?" => $userId
+        ));
+        $blabla->delete();
         $session->erase('user');
 
         self::redirect("/login");

@@ -1,5 +1,5 @@
-<article class="grid_8">
-    <h1>Login to administration</h1>
+<article class="adminLogin">
+    <h1 class="nadpis">Přihlášení k administraci</h1>
     <form method="post" action="#" class="stdform">
         <p>
             {if isset($account_error)}
@@ -9,31 +9,41 @@
             {/if}
         </p>
         <p>
-            <label>Email</label>
-            <span class="field">
-                <input type="email" name="email" class="mediuminput" required/>
-            </span>
-            {if isset($email_error)}
-            <span class="error">
-                {echo $email_error}
-            </span>
-            {/if}
+        <table class="loginAdmin">
+            <tr>
+                <td>
+                    Email
+                </td>
+                <td>
+                    <input type="email" name="email" class="loginInput" required/>
+                </td>
+                <td> {if isset($email_error)}
+                    <span class="error">
+                        {echo $email_error}
+                    </span>{/if}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Password
+                </td>
+                <td>
+                    <input type="password" name="password" class="loginInput" required/>
+                </td>
+                <td>
+                    {if isset($password_error)}
+                    <span class="error">
+                        {echo $password_error}
+                    </span>
+                    {/if}
+                </td>
+            </tr>
+        </table>
         </p>
         <p>
-            <label>Password</label>
-            <span class="field">
-                <input type="password" name="password" class="mediuminput" required/>
-            </span>
-            {if isset($password_error)}
-            <span class="error">
-                {echo $password_error}
-            </span>
-            {/if}
-        </p>
-        <p>
-            <span class="field">
-                <input type="submit" name="login" class="mediuminput" value="Přihlásit" />
-            </span>
+            <div class="buttonWrapperAdmin">
+                <input class="chatButton" type="submit" name="login" value="Přihlásit" />
+            </div>
         </p>
 
     </form>

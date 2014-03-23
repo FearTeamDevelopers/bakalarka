@@ -1,65 +1,87 @@
 <div class="queueDiv">
+    {if !empty($qarray)}
+    <div class="countQ">
+        Lidí ve frontě: {echo $qcount}
+    </div>
     {foreach $bla in $qarray}
     <div class="qUserWrapper">
         <div class="qUserName">
             {echo $bla->firstname." ".$bla->lastname}
         </div>
-        <form method="post" action="/admin/index/changeStatus/{echo $bla->id}" class="qButtons">
-            <input type="submit" class="qChangeStatus" value="Active"/>
-        </form>
-    </div>
-    {/foreach}
-</div>
-<header class="chatHeader">
-    <div class="logout">
-        <a href="/admin/logout">X</a>
-    </div>
-    <div class="info">
-        Online Chat
-    </div>
-</header>
-<div class="chatWindow">
-    <div class="chatContentWrapper">
-        <div class="chatContent">
-            <div class="messageWrapper">
-                               
-                {foreach $k in $vypiskonverzace}
-
-                {if $k->from = 1}
-                <div  class="messageNameRed">
-                    {echo $k->firstname." ".$k->lastname}          
-                </div>
-                {/if}
-                {if $k->from <> 1} 
-                <div  class="messageNameBlue">
-                    {echo $k->firstname." ".$k->lastname}
-                </div>
-                {/if}
-
-                <div class="message">
-                    {echo $k->message}
-                </div>
-                {/foreach}        
-               
-            </div>
-
-
-        </div>
-
-        <div class="chatInputs">
-            <form id="inputForm" method="post" action="/admin/submitChat">
-
-                {if isset($error)}
-                <span class="error">
-                    {echo $error}
-                </span>
-                {/if}
-
-                <br/>
-                <input type="text" name="chatTextInput" class="chatTextInput" required/>
-                <input type="submit" name="chatTextSubmit" value="Odeslat" />
+        <div class="qButtons">
+            <form method="post" action="/admin/index/changeStatus/{echo $bla->id}" >
+                <input type="submit" class="qChangeStatus" value="Active | Deactive"/>
             </form>
         </div>
+    </div>
+    {/foreach}
+    {/if}
+</div>
+<div style="float:right">
+    <a class="chatButtonAdmin" href="/admin/logout">Odhlásit se</a>
+</div>
+<div class="chatWrapper">
+    <header class="chatHeader">
+        <div class="logout">
+            <a href="/admin/delete"><img alt="Ukončit konverzaci" class="logoutImage" src="/public/images/x.png"></a>
 
+        </div>
+        <div class="info">
+            {if empty($user)}
+            {echo "Online Chat"}
+            {/if}
+            {else}
+            {foreach $u in $user}
+            {echo $u->firstname." ".$u->lastname}
+            {/foreach}
+            {/else}
+        </div>
+    </header>
+    <div class="chatWindow">
+        <div class="chatContentWrapper">
+            <div class="chatContent">
+
+                <div id="messageWrapper">
+                    {if !empty($vypiskonverzace)}
+                    {foreach $k in $vypiskonverzace}
+
+                    {if $k->from == 1}
+                    <div  class="messageNameRed">
+                        {echo $k->firstname." ".$k->lastname}          
+                    </div>
+                    {/if}
+                    {if $k->from != 1} 
+                    <div  class="messageNameBlue">
+                        {echo $k->firstname." ".$k->lastname}
+                    </div>
+                    {/if}
+
+                    <div class="message">
+                        {echo $k->message}
+                    </div>
+                    {/foreach}        
+                    {/if}
+                </div>
+
+
+            </div>
+
+            <div class="chatInputs">
+                <form id="inputForm" method="post" action="/admin/submitChat">
+
+                    {if isset($error)}
+                    <span class="error">
+                        {echo $error}
+                    </span>
+                    {/if}
+
+                    <br/>
+                    <textarea rows="3" cols="60" name="chatTextInput" required></textarea>
+                    <br/>
+                    <input type="submit" name="chatTextSubmit" class="chatButtonAdmin" value="Odeslat" />
+                </form>
+            </div>
+
+        </div>
     </div>
 </div>

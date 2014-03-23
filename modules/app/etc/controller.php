@@ -14,7 +14,7 @@ use THCFrame\Controller\Controller as BaseController;
 class Controller extends BaseController {
 
     protected static $_imageExtensions = array('gif', 'jpg', 'png', 'jpeg');
-    
+
     /**
      * @protected
      */
@@ -25,7 +25,6 @@ class Controller extends BaseController {
         if (!$user) {
             self::redirect("/login");
         }
-    
     }
 
     /**
@@ -51,12 +50,23 @@ class Controller extends BaseController {
 
         $database = Registry::get("database");
         $database->connect();
-        
+
         // schedule disconnect from database 
         Events::add("framework.controller.destruct.after", function($name) {
-                    $database = Registry::get("database");
-                    $database->disconnect();
-                });
+            $database = Registry::get("database");
+            $database->disconnect();
+        });
+    }
+
+    public function _deleted() {
+       $session = Registry::get('session');
+        $user=$session->get('user');
+        $userId = $user->getId();
+
+        $deleted = App_Model_User::first(array("id = ?" => $userId, "deleted =?" => true));
+        if ($deleted) {
+            self::redirect("/logout");
+        }
     }
 
     /**

@@ -25,11 +25,20 @@ $(document).ready(function() {
     });
 
 
+
+   
+    $(window).load(scrollDown);
+     
 });
+scrollDown = function() {
+   document.getElementById("messageWrapper2").scrollTop = document.getElementById("messageWrapper2").scrollHeight;
+} ;
+
 
 
 setInterval(function() {
-    $(".chatContent .messageWrapper").load("/app/index/loadKonversation/");
+    $(".chatContent #messageWrapper2").load("/app/index/loadKonversation/");
+   $(".chatContent #messageWrapper2").load(scrollDown);
     var bla = $(".chatInputs").is(":visible");
     if(bla == false){
         $.post("/app/index/checkStatus/", function(msg){

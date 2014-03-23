@@ -1,14 +1,13 @@
 <?php
 
 use THCFrame\Model\Model;
-use THCFrame\Security\UserInterface;
 
 /**
  * Description of UserModel
  *
  * @author Tomy
  */
-class App_Model_Queue extends Model implements UserInterface {
+class App_Model_Queue extends Model {
 
     /**
      * @column
@@ -57,7 +56,5 @@ class App_Model_Queue extends Model implements UserInterface {
      */
     protected $_modified;
     
-public function isActive() {
-    }
 }
 

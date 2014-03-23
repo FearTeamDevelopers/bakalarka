@@ -103,6 +103,13 @@ class App_Model_User extends Model implements UserInterface {
      * @type datetime
      */
     protected $_lastActive;
+        /**
+     * @column
+     * @readwrite
+     * @type boolean
+     * @index
+     */
+    protected $_deleted;
 
     /**
      * 

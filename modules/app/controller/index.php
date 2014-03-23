@@ -49,7 +49,7 @@ class App_Controller_Index extends Controller
 
         $query->join("tb_user", "tb_konverzace.from = k.id", "k", array("k.firstname", "k.lastname"))
                 ->wheresql("tb_konverzace.from = {$userId} OR tb_konverzace.to = {$userId}")
-                ->order("tb_konverzace.created", "desc");
+                ->order("tb_konverzace.created", "asc");
 
         $vypiskonverzace = App_Model_Konverzace::initialize($query);
         $view->set('vypiskonverzace', $vypiskonverzace);
@@ -112,7 +112,7 @@ class App_Controller_Index extends Controller
 
             $query->join("tb_user", "tb_konverzace.from = k.id", "k", array("k.firstname", "k.lastname"))
                     ->wheresql("tb_konverzace.from = {$userId} OR tb_konverzace.to = {$userId}")
-                    ->order("tb_konverzace.created", "desc");
+                    ->order("tb_konverzace.created", "asc");
 
             $vypiskonverzace = App_Model_Konverzace::initialize($query);
             $str = '';
@@ -140,12 +140,13 @@ class App_Controller_Index extends Controller
                 $queueCount = 1;
             }
             $queueCount += $queueStart;
-            echo "Jste {$queueCount}. v pořadí počkejte pár dní než předchozí uchazeč ukončí konverzaci.";
+            echo "Jste {$queueCount}. v pořadí,
+            prosíme počkejte pár minut, než na vás dojde řada.";
         }
     }
 
     /**
-     * 
+     * @before _deleted
      */
     public function checkStatus()
     {

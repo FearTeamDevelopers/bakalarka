@@ -1,14 +1,13 @@
 <?php
 
 use THCFrame\Model\Model;
-use THCFrame\Security\UserInterface;
 
 /**
  * Description of UserModel
  *
  * @author Tomy
  */
-class App_Model_Konverzace extends Model implements UserInterface {
+class App_Model_Konverzace extends Model {
 
     /**
      * @column
@@ -17,31 +16,33 @@ class App_Model_Konverzace extends Model implements UserInterface {
      * @type auto_increment
      */
     protected $_id;
+
     /**
      * @column
      * @readwrite
      * @type integer
      */
     protected $_from;
-        /**
+
+    /**
      * @column
      * @readwrite
      * @type integer
      */
     protected $_to;
-    
+
     /**
      * @column
      * @readwrite
-     * @lenght 150
+     * @lenght 256
      * @type text
      * @label message
      * 
      * @validate required, alphanumeric
      */
     protected $_message;
-    
-        /**
+
+    /**
      * @column
      * @readwrite
      * @type datetime
@@ -54,8 +55,5 @@ class App_Model_Konverzace extends Model implements UserInterface {
      * @type datetime
      */
     protected $_modified;
-    
-     public function isActive() {
-        return (boolean) $this->_active;
-    }
+
 }

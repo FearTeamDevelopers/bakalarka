@@ -1,6 +1,7 @@
 <header class="chatHeader">
     <div class="logout">
-        <a href="/logout">X</a>
+        <a href="/logout"><img class="logoutImage" src="/public/images/x.png"></a>
+
     </div>
     <div class="info">
         Online Chat
@@ -9,24 +10,24 @@
 
 <div class="chatContentWrapper">
     <div class="chatContent">
-        <div class="messageWrapper">
-              <!----------------------------------------------------------->
-        <!--            vypisovani Q-->
-        {if $questatus == false}
-        Jste {echo $queuecount}. v pořadí
-        počkejte pár dní než předchozí uchazeč ukončí konverzaci.
-        {/if}
-        <!----------------------------------------------------------->       
-        <!--                    vypisovani zprav-->
-        {else}
+        <div id="messageWrapper2">
+            <!----------------------------------------------------------->
+            <!--            vypisovani Q-->
+            {if $questatus == false}
+            Jste {echo $queuecount}. v pořadí,
+            prosíme počkejte pár minut, než na vás dojde řada.
+            {/if}
+            <!----------------------------------------------------------->       
+            <!--                    vypisovani zprav-->
+            {else}
             {foreach $k in $vypiskonverzace}
 
-            {if $k->from = 1}
+            {if $k->from == 1}
             <div  class="messageNameRed">
                 {echo $k->firstname." ".$k->lastname}          
             </div>
             {/if}
-            {if $k->from <> 1} 
+            {if $k->from != 1} 
             <div  class="messageNameBlue">
                 {echo $k->firstname." ".$k->lastname}
             </div>
@@ -36,9 +37,9 @@
                 {echo $k->message}
             </div>
             {/foreach}        
-        {/else}
+            {/else}
         </div>
-        
+
 
     </div>
 
@@ -51,10 +52,15 @@
                 {echo $error}
             </span>
             {/if}
+            <textarea class="chatTextarea" rows="3" cols="25" name="chatTextInput" required>
+            </textarea>
+            <div class="chatButtonWrapper">
+                <input class="chatButton" type="submit" name="chatTextSubmit" value="Odeslat" />
+            </div>
             
-            <br/>
-            <input type="text" name="chatTextInput" class="chatTextInput" required/>
-            <input type="submit" name="chatTextSubmit" value="Odeslat" />
+            
+
+
         </form>
     </div>
     {/if}
