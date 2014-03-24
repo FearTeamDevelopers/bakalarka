@@ -151,7 +151,7 @@ h1 {
     background-color:#ccc;
     width:350px;
     height:450px;
-    /*display:none;*/
+    display:none;
     border-radius:10px;
 }
 
