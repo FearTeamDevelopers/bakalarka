@@ -1,9 +1,14 @@
 
 
 <article id="chat">
+   {if !empty($flashMessage)}
+            <section class="container_12">
+                <div class="ad-notif-info grid_12"><p>{echo $flashMessage}</p></div>
+            </section>
+            {/if}
     <div class="info">
         Vítejte na online chatu.<br/>
-        Vyplňte následující informace
+        Vyplňte následující údaje
     </div>
     <div class="chatContent">
         <form action="#" method="post">

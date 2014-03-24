@@ -20,10 +20,19 @@ class Controller extends BaseController {
      */
     public function _secured() {
         $session = Registry::get("session");
+        $view = $this->getActionView();
 
         $user = $session->get('user');
         if (!$user) {
             self::redirect("/login");
+        } else {
+            $userId = $user->getId();
+            $userD = \App_Model_User::first(array("id = ?" => $userId));
+            $deleted = $userD->getDeleted();
+            if($deleted){
+                $view->flashMessage("Vaše konverzace byla ukončena");
+                self::redirect("/logout");
+            }
         }
     }
 
@@ -59,8 +68,8 @@ class Controller extends BaseController {
     }
 
     public function _deleted() {
-       $session = Registry::get('session');
-        $user=$session->get('user');
+        $session = Registry::get('session');
+        $user = $session->get('user');
         $userId = $user->getId();
 
         $deleted = App_Model_User::first(array("id = ?" => $userId, "deleted =?" => true));

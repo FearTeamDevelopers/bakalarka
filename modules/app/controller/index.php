@@ -56,7 +56,7 @@ class App_Controller_Index extends Controller
     }
 
     /**
-     * 
+     *  @before _secured
      */
     public function submitChat()
     {
@@ -91,7 +91,7 @@ class App_Controller_Index extends Controller
     }
 
     /**
-     * 
+     *  @before _secured
      */
     public function loadKonversation()
     {
@@ -146,7 +146,7 @@ class App_Controller_Index extends Controller
     }
 
     /**
-     * @before _deleted
+     * @before _secured
      */
     public function checkStatus()
     {
