@@ -6,15 +6,11 @@
 
 $(document).ready(function() {
 
-    $(window).load(function() {
-        $("#loader, .loader").hide();
-        //$.post("/ajaxSubmit", {text: 'bla'});
-    });
-
     /* GLOBAL SCRIPTS */
 
     $('#hide').click(function() {
-        $('#chatWrapper').toggle(800);
+        $('#chatWrapper').show(500);
+        $(this).hide(500);
     });
 
     $(".datepicker").datepicker({
@@ -24,35 +20,71 @@ $(document).ready(function() {
         firstDay: 1
     });
 
+    $('#inputForm').submit(function(event) {
+
+        var formData = {
+            'chatTextInput': $('#inputForm .chatTextarea').val()
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/submitChat',
+            data: formData,
+            dataType: 'text'
+        }).done(function(data) {
+            $('#inputForm .chatTextarea').text('');
+            $(".chatContent #messageWrapper2").load("/app/index/loadKonversation/")
+                    .delay(500)
+                    .animate({scrollTop: $('#clearence').offset().top}, 'fast');
+        }).fail(function(data) {
+            //alert(data);
+        });
+
+        event.preventDefault();
+    });
 
 
-   
-    $(window).load(scrollDown);
-     
+    //$(window).load(scrollDown);
+
 });
+
 scrollDown = function() {
-   document.getElementById("messageWrapper2").scrollTop = document.getElementById("messageWrapper2").scrollHeight;
-} ;
-
-
+    document.getElementById("messageWrapper2").scrollTop = document.getElementById("messageWrapper2").scrollHeight;
+};
 
 setInterval(function() {
-    $(".chatContent #messageWrapper2").load("/app/index/loadKonversation/");
-   $(".chatContent #messageWrapper2").load(scrollDown);
-    var bla = $(".chatInputs").is(":visible");
-    if(bla == false){
-        $.post("/app/index/checkStatus/", function(msg){
-            if(msg == 'ok'){
+
+    $(".chatContent #messageWrapper2")
+            .load("/app/index/loadKonversation/")
+            .load(scrollDown);
+
+    var messageInput = $(".chatInputs").is(":visible");
+    
+    if (messageInput == false) {
+        $.post("/app/index/checkStatus/", function(msg) {
+            if (msg == 1) {
                 location.reload(1);
-            }else{
+
+            } else {
                 $(".chatInputs").hide();
             }
         });
-    }else{
-        $.post("/app/index/checkStatus/", function(msg){
-            if(msg == 'no'){
+    } else {
+        $.post("/app/index/checkStatus/", function(msg) {
+            if (msg == 3) { //konversation inactive
                 $(".chatInputs").hide();
+            } else if (msg == 2) { //user deleted by admin
+                window.location = "/logout";
+                
+                //delete na strane admina a tady pak jen
+                //location.reload(1);
+            } else if (msg == 4) { //no user in session - user is not logged
+                window.location = "/login";
+
+                //location.reload(1);
             }
         });
+        
     }
+
 }, 5000);

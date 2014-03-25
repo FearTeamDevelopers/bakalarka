@@ -38,8 +38,8 @@
             </div>
             {/foreach}        
             {/else}
+            <div id="clearence"></div>
         </div>
-
 
     </div>
 
@@ -52,15 +52,10 @@
                 {echo $error}
             </span>
             {/if}
-            <textarea class="chatTextarea" rows="3" cols="25" name="chatTextInput" required>
-            </textarea>
+            <textarea class="chatTextarea" rows="3" cols="25" name="chatTextInput" required></textarea>
             <div class="chatButtonWrapper">
                 <input class="chatButton" type="submit" name="chatTextSubmit" value="Odeslat" />
             </div>
-            
-            
-
-
         </form>
     </div>
     {/if}
