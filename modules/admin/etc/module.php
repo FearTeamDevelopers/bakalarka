@@ -35,8 +35,32 @@ class Admin_Etc_Module extends Module {
         array(
             'pattern' => '/admin/delete',
             'module' => 'admin',
-            'controller' => 'user',
-            'action' => 'delete',
+            'controller' => 'index',
+            'action' => 'deleteUserFromQ',
+        ),
+        array(
+            'pattern' => '/admin/setWriting',
+            'module' => 'admin',
+            'controller' => 'index',
+            'action' => 'setWriting',
+        ),
+        array(
+            'pattern' => '/admin/setNotWriting',
+            'module' => 'admin',
+            'controller' => 'index',
+            'action' => 'setNotWriting',
+        ),
+        array(
+            'pattern' => '/admin/userIsWriting',
+            'module' => 'admin',
+            'controller' => 'index',
+            'action' => 'userIsWriting',
+        ),
+        array(
+            'pattern' => '/admin/adminIsWriting',
+            'module' => 'admin',
+            'controller' => 'index',
+            'action' => 'adminIsWriting',
         )
     );
 

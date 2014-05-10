@@ -11,14 +11,16 @@ use THCFrame\Controller\Controller as BaseController;
  *
  * @author Tomy
  */
-class Controller extends BaseController {
+class Controller extends BaseController
+{
 
     protected static $_imageExtensions = array('gif', 'jpg', 'png', 'jpeg');
 
     /**
      * @protected
      */
-    public function _secured() {
+    public function _secured()
+    {
         $session = Registry::get("session");
         $security = Registry::get("security");
         $lastActive = $session->get("lastActive");
@@ -43,7 +45,8 @@ class Controller extends BaseController {
     /**
      * @protected
      */
-    public function _admin() {
+    public function _admin()
+    {
         $security = Registry::get("security");
         $view = $this->getActionView();
 
@@ -57,7 +60,8 @@ class Controller extends BaseController {
     /**
      * @protected
      */
-    public function _superadmin() {
+    public function _superadmin()
+    {
         $security = Registry::get("security");
         $view = $this->getActionView();
 
@@ -72,7 +76,8 @@ class Controller extends BaseController {
      * 
      * @param type $options
      */
-    public function __construct($options = array()) {
+    public function __construct($options = array())
+    {
         parent::__construct($options);
 
         $database = Registry::get("database");
@@ -80,15 +85,16 @@ class Controller extends BaseController {
 
         // schedule disconnect from database 
         Events::add("framework.controller.destruct.after", function($name) {
-                    $database = Registry::get("database");
-                    $database->disconnect();
-                });
+            $database = Registry::get("database");
+            $database->disconnect();
+        });
     }
 
     /**
      * load user from security context
      */
-    public function getUser() {
+    public function getUser()
+    {
         $security = Registry::get("security");
         $user = $security->getUser();
 
@@ -98,7 +104,8 @@ class Controller extends BaseController {
     /**
      * 
      */
-    public function render() {
+    public function render()
+    {
         if ($this->getUser()) {
             if ($this->getActionView()) {
                 $this->getActionView()
@@ -112,6 +119,12 @@ class Controller extends BaseController {
         }
 
         parent::render();
+    }
+
+    protected function loadConfigDb($key)
+    {
+        $object = \App_Model_Options::first(array('nazev = ?' => $key));
+        return $object;
     }
 
 }

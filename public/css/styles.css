@@ -206,12 +206,13 @@ h1 {
     box-shadow:inset 1px 1px 10px 1px #fb9e25;
     margin:20px;
     max-height:220px;
-
+    overflow-x: no-display;
 
 }
 #messageWrapper2{
     margin:10px;
     overflow-y:auto;
+    overflow-x: no-display;
     max-height:220px;
     color:#000;
     font-size:12px;
@@ -268,12 +269,10 @@ h1 {
 
 .chatInputs{
     left:8%;
-    right:5%;
     bottom:1%;
     position:absolute;
-    width:87%;
+    width:90%;
 }
-
 
 
 
@@ -410,6 +409,8 @@ h1 {
     float:right;
 
 }
+
+.no-display{display: none;}
 /******************************************************************/
 
 @media only screen and (min-width: 0px) and (max-width: 860px){

@@ -6,58 +6,59 @@
     <div class="info">
         Online Chat
     </div>
-</header>
+</header> 
 
-<div class="chatContentWrapper">
-    <div class="chatContent">
-        <div id="messageWrapper2">
-            <!----------------------------------------------------------->
-            <!--            vypisovani Q-->
-            {if $questatus == false}
-            Jste {echo $queuecount}. v pořadí,
-            prosíme počkejte pár minut, než na vás dojde řada.
-            {/if}
-            <!----------------------------------------------------------->       
-            <!--                    vypisovani zprav-->
-            {else}
-            {foreach $k in $vypiskonverzace}
-
-            {if $k->from == 1}
-            <div  class="messageNameRed">
-                {echo $k->firstname." ".$k->lastname}          
-            </div>
-            {/if}
-            {if $k->from != 1} 
-            <div  class="messageNameBlue">
-                {echo $k->firstname." ".$k->lastname}
-            </div>
-            {/if}
-
-            <div class="message">
-                {echo $k->message}
-            </div>
-            {/foreach}        
-            {/else}
-            <div id="clearence"></div>
-        </div>
-
+<article id="loginStep">
+    <div class="errorBox"></div>
+    <div class="info">
+        Vítejte na online chatu.<br/>
+        Vyplňte následující údaje
     </div>
+    <div class="chatContent">
+        <form action="#" method="post">
 
-    {if $questatus == true}
-    <div class="chatInputs">
-        <form id="inputForm" method="post" action="/submitChat">
-
-            {if isset($error)}
-            <span class="error">
-                {echo $error}
-            </span>
-            {/if}
-            <textarea class="chatTextarea" rows="3" cols="25" name="chatTextInput" required></textarea>
-            <div class="chatButtonWrapper">
-                <input class="chatButton" type="submit" name="chatTextSubmit" value="Odeslat" />
+            <table class="login">
+                <tr><td><label for="name">Jméno</label> <br/><input class="chatTextInput" type="text" name="firstname" required maxlength="30"/><br/></td></tr>
+                <tr><td><label for="email">Příjmení</label><br/><input class="chatTextInput" type="text" name="lastname" required maxlength="30" /></td></tr>
+            </table>
+            <div class="buttonWrapper">
+                <input class="chatButton" id="loginButton" type="button" name="continue" value="Pokračovat"/>    
             </div>
         </form>
     </div>
-    {/if}
+</article>
 
-</div>
+<article id="chatStep">
+    <div class="chatContentWrapper">
+        <div class="chatContent">
+            <div class="loader"><img src="/public/images/loader1.gif" alt="Loading Icon" /></div>
+            <div id="messageWrapper2"></div>
+        </div>
+
+        
+        <div class="chatInputs no-display">
+            <form id="inputForm" method="post" action="/submitChat">
+
+                {if isset($error)}
+                <span class="error">
+                    {echo $error}
+                </span>
+                {/if}
+                <span id="writingIndicator" class="no-display">operator píše....</span>
+                <br/>
+                <textarea class="chatTextarea" id="chatTextarea" rows="3" cols="25" name="chatTextInput" required></textarea>
+                <div class="chatButtonWrapper">
+                    <input class="chatButton" type="submit" name="chatTextSubmit" value="Odeslat" />
+                </div>
+            </form>
+        </div>
+        <audio id="activeSound">
+            <source src="/public/sound/pizzicato.ogg"></source>
+            <source src="/public/sound/pizzicato.mp3"></source>
+        </audio>
+      
+
+    </div>
+</article>
+
+

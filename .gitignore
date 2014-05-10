@@ -1,7 +1,7 @@
-/application/configuration/config.ini
+/application/configuration/config_live.ini
+/application/configuration/config_qa.ini
 /application/configuration/install.sql
 /public/uploads/
-/temp/cache/
+/temp/
 /application/logs/
 /nbproject/
-/application/configuration/config_qa.ini

@@ -1,6 +1,12 @@
+<audio id="adminSound">
+    <source src="/public/sound/launch1.ogg"></source>
+    <source src="/public/sound/launch1.mp3"></source>
+</audio>
 <div class="queueDiv">
+
     {if !empty($qarray)}
     <div class="countQ">
+
         Lidí ve frontě: {echo $qcount}
     </div>
     {foreach $bla in $qarray}
@@ -18,14 +24,14 @@
     {/if}
 </div>
 <div style="float:right">
+    <button class="chatButtonAdmin" id="konec">Ukončit konverzaci</button>
     <a class="chatButtonAdmin" href="/admin/logout">Odhlásit se</a>
+
 </div>
 <div class="chatWrapper">
     <header class="chatHeader">
-        <div class="logout">
-            <a href="/admin/delete"><img alt="Ukončit konverzaci" class="logoutImage" src="/public/images/x.png"></a>
-
-        </div>
+        <!--        <div class="logout">
+                          </div>-->
         <div class="info">
             {if empty($user)}
             {echo "Online Chat"}
@@ -45,12 +51,12 @@
                     {if !empty($vypiskonverzace)}
                     {foreach $k in $vypiskonverzace}
 
-                    {if $k->from == 1}
+                    {if $k->fromUser == 1}
                     <div  class="messageNameRed">
                         {echo $k->firstname." ".$k->lastname}          
                     </div>
                     {/if}
-                    {if $k->from != 1} 
+                    {if $k->fromUser != 1} 
                     <div  class="messageNameBlue">
                         {echo $k->firstname." ".$k->lastname}
                     </div>
@@ -74,9 +80,9 @@
                         {echo $error}
                     </span>
                     {/if}
-
+                    <span id="writingIndicator" class="no-display">uživatel píše....</span>
                     <br/>
-                    <textarea rows="3" cols="60" name="chatTextInput" required></textarea>
+                    <textarea rows="3" cols="60" id="chatTextarea" name="chatTextInput" required></textarea>
                     <br/>
                     <input type="submit" name="chatTextSubmit" class="chatButtonAdmin" value="Odeslat" />
                 </form>
@@ -85,3 +91,24 @@
         </div>
     </div>
 </div>
+
+<article id="options">
+    <h1 class="countQ">chat je {if $chatActive->value == 1} aktivní {/if}{else}zakázán{/else}</h1>
+    <form method="post" action="/admin/index/saveConfigData/">
+        <label for="activeChat">Povolení/ Zakázaní chatu</label></br>
+        <select name="activeChat">
+            {if $chatActive->value == 1}
+            <option value="0">Zakázat</option>
+            <option value="1" selected>Povolit</option>
+            {/if}
+            {else}
+            <option value="0" selected>Zakázat</option>
+            <option value="1">Povolit</option>
+            {/else}
+        </select></br></br>
+
+        <label for="welcomeMessage">Uvítací zpráva</label></br>
+        <textarea name="welcomeMessage" type="text">{echo $welcomemessage->value}</textarea></br>
+        <input class="chatButtonAdmin" type="submit" name="submitWelcomeMessage" value="uložit"/>
+    </form>
+</article>

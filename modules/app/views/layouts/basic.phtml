@@ -40,8 +40,10 @@
                             {yield action}
                         </section>
                     </div>
-                </div>    
-                <input type="button" id="hide" name="displayChat" value="Chat"/>
+                </div>
+                {if $showbtn}
+                <input type="button" class="no-display" id="hide" name="displayChat" value="Chat"/>
+                {/if}
             </div>
 
         </div>

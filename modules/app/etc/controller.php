@@ -11,50 +11,44 @@ use THCFrame\Controller\Controller as BaseController;
  *
  * @author Tomy
  */
-class Controller extends BaseController {
+class Controller extends BaseController
+{
 
     protected static $_imageExtensions = array('gif', 'jpg', 'png', 'jpeg');
 
     /**
      * @protected
      */
-    public function _secured() {
+    public function _secured()
+    {
         $session = Registry::get("session");
         $view = $this->getActionView();
 
         $user = $session->get('user');
-        if (!$user) {
-            self::redirect("/login");
-        } else {
+
+        if ($user && $user instanceof \App_Model_User) {
+            $isLogged = true;
+
             $userId = $user->getId();
             $userD = \App_Model_User::first(array("id = ?" => $userId));
             $deleted = $userD->getDeleted();
-            if($deleted){
-                $view->flashMessage("Vaše konverzace byla ukončena");
-                self::redirect("/logout");
+
+            if ($deleted) {
+                $isLogged = false;
             }
+        } else {
+            $isLogged = false;
         }
-    }
 
-    /**
-     * @protected
-     */
-    public function _admin() {
-        $security = Registry::get("security");
-        $view = $this->getActionView();
-
-        if ($security->getUser() && !$security->isGranted("role_admin")) {
-            $view->flashMessage("Access denied! Administrator access level required.");
-            $security->logout();
-            self::redirect("/login");
-        }
+        $view->set('islogged', $isLogged);
     }
 
     /**
      * 
      * @param type $options
      */
-    public function __construct($options = array()) {
+    public function __construct($options = array())
+    {
         parent::__construct($options);
 
         $database = Registry::get("database");
@@ -67,21 +61,11 @@ class Controller extends BaseController {
         });
     }
 
-    public function _deleted() {
-        $session = Registry::get('session');
-        $user = $session->get('user');
-        $userId = $user->getId();
-
-        $deleted = App_Model_User::first(array("id = ?" => $userId, "deleted =?" => true));
-        if ($deleted) {
-            self::redirect("/logout");
-        }
-    }
-
     /**
      * load user from security context
      */
-    public function getUser() {
+    public function getUser()
+    {
         $security = Registry::get("security");
         $user = $security->getUser();
 
@@ -91,20 +75,16 @@ class Controller extends BaseController {
     /**
      * 
      */
-    public function render() {
-        if ($this->getUser()) {
-            if ($this->getActionView()) {
-                $this->getActionView()
-                        ->set("authUser", $this->getUser());
-            }
-
-            if ($this->getLayoutView()) {
-                $this->getLayoutView()
-                        ->set("authUser", $this->getUser());
-            }
-        }
+    public function render()
+    {
 
         parent::render();
+    }
+
+    protected function loadConfigDb($key)
+    {
+        $object = \App_Model_Options::first(array('nazev = ?' => $key));
+        return $object;
     }
 
 }

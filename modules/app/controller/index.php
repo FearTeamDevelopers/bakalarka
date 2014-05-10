@@ -12,45 +12,28 @@ use THCFrame\Request\RequestMethods;
 class App_Controller_Index extends Controller
 {
 
-    /**
-     * @before _secured
-     */
     public function index()
     {
         $view = $this->getActionView();
-        $session = Registry::get("session");
-        $user = $session->get("user");
+        $layout = $this->getLayoutView();
 
-        if ($user) {
-            $userId = $user->getId();
+        $session = Registry::get('session');
+        $user = $session->get('user');
+        $active = $this->loadConfigDb('chatActive');
 
-            $queueStatus = App_Model_Queue::first(array('idUser = ?' => $userId, 'active = ?' => true));
-            if ($queueStatus) {
-                $queueCount = 1;
-            } else {
-                $queueCount = App_Model_Queue::count(
-                                array(
-                                    'active = ?' => false,
-                                    'idUser <> ?' => $userId
-                                )
-                );
-                if (null === $queueCount) {
-                    $queueCount = 1;
-                }
-            }
-
-            $view->set('queuecount', $queueCount + 1)
-                    ->set('questatus', $queueStatus);
-
-            $query = App_Model_Konverzace::getQuery(array("tb_konverzace.*"));
-
-            $query->join("tb_user", "tb_konverzace.from = k.id", "k", array("k.firstname", "k.lastname"))
-                    ->wheresql("tb_konverzace.from = {$userId} OR tb_konverzace.to = {$userId}")
-                    ->order("tb_konverzace.created", "asc");
-
-            $vypiskonverzace = App_Model_Konverzace::initialize($query);
-            $view->set('vypiskonverzace', $vypiskonverzace);
+        if ($user && $user instanceof App_Model_User) {
+            $isLogged = true;
+        } else {
+            $isLogged = false;
         }
+
+        $showBtn = false;
+        if ($active->getValue()) {
+            $showBtn = true;
+        }
+
+        $view->set('islogged', $isLogged);
+        $layout->set('showbtn', $showBtn);
     }
 
     /**
@@ -66,64 +49,59 @@ class App_Controller_Index extends Controller
         if ($user) {
             $userId = $user->getId();
         } else {
-            $view->set('error', 'user id is not set');
-            self::redirect('/');
+            echo 'Your are not logged in';
         }
 
         $konverzace = new App_Model_Konverzace(array(
-            "from" => $userId,
-            "to" => 1,
-            "message" => RequestMethods::post('chatTextInput'),
-            "created" => date("Y-m-d H:i:s"),
-            "modified" => date("Y-m-d H:i:s")
+            'fromUser' => $userId,
+            'toUser' => 1,
+            'message' => RequestMethods::post('chatTextInput')
         ));
 
         if ($konverzace->validate()) {
             $konverzace->save();
             echo 'success';
-            //self::redirect('/');
         } else {
-            //echo serialize($konverzace->getErrors());
-            echo 'error';
+            echo 'Your message contain disallowed characters';
         }
     }
 
     /**
      *  @before _secured
      */
-    public function loadKonversation()
+    public function loadConversation()
     {
         $this->willRenderLayoutView = false;
 
-        $session = Registry::get("session");
-        $user = $session->get("user");
+        $session = Registry::get('session');
+        $user = $session->get('user');
 
         if ($user) {
             $userId = $user->getId();
 
-            $queue = App_Model_Queue::first(array("idUser = ?" => $userId, "active = ?" => true));
+            $queue = App_Model_Queue::first(array('idUser = ?' => $userId, 'active = ?' => true));
             if ($queue != null) {
 
-                $query = App_Model_Konverzace::getQuery(array("tb_konverzace.*"));
+                $query = App_Model_Konverzace::getQuery(array('tb_konverzace.*'));
 
-                $query->join("tb_user", "tb_konverzace.from = k.id", "k", array("k.firstname", "k.lastname"))
-                        ->wheresql("tb_konverzace.from = {$userId} OR tb_konverzace.to = {$userId}")
-                        ->order("tb_konverzace.created", "asc");
+                $query->join('tb_user', 'tb_konverzace.fromUser = k.id', 'k', array('k.firstname', 'k.lastname'))
+                        ->wheresql("tb_konverzace.fromUser = {$userId} OR tb_konverzace.toUser = {$userId}")
+                        ->order('tb_konverzace.created', 'asc');
 
                 $vypiskonverzace = App_Model_Konverzace::initialize($query);
                 $str = '';
 
                 foreach ($vypiskonverzace as $k) {
-                    if ($k->from == 1) {
+                    if ($k->fromUser == 1) {
                         $str .= "<div  class=\"messageNameRed\">{$k->firstname} {$k->lastname}</div>";
-                    } elseif ($k->from != 1) {
+                    } elseif ($k->fromUser != 1) {
                         $str .= "<div  class=\"messageNameBlue\">{$k->firstname} {$k->lastname}</div>";
                     }
 
                     $str .= "<div class=\"message\">{$k->message}</div>";
                 }
                 $str .= "<div id=\"clearence\"></div>";
-                
+
                 echo $str;
             } else {
                 $queueStart = 1;
@@ -150,18 +128,21 @@ class App_Controller_Index extends Controller
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        $session = Registry::get("session");
-        $user = $session->get("user");
+        $session = Registry::get('session');
+        $user = $session->get('user');
 
         if ($user) {
             $userId = $user->getId();
 
             $userObj = App_Model_User::first(array('id = ?' => $userId));
+            $q = App_Model_Queue::first(array('active = ?' => true));
 
             if ($userObj->getDeleted()) {
+                $q->delete();
+                $session->erase('user');
                 echo 2; //user deleted by admin
             } else {
-                $queue = App_Model_Queue::first(array("idUser = ?" => $userId, "active = ?" => true));
+                $queue = App_Model_Queue::first(array('idUser = ?' => $userId, 'active = ?' => true));
 
                 if ($queue != null) {
                     echo 1; //konversation active
@@ -171,6 +152,59 @@ class App_Controller_Index extends Controller
             }
         } else {
             echo 4; //no user in session - user is not logged
+        }
+    }
+
+    /**
+     * 
+     */
+    public function checkUser()
+    {
+        $session = Registry::get('session');
+        $user = $session->get('user');
+
+        if ($user && $user instanceof App_Model_User) {
+            echo 'ok';
+        } else {
+            echo 'err';
+        }
+    }
+
+    public function setWriting()
+    {
+        $q = App_Model_Queue::first(array('active = ?' => true));
+        if ($q != null) {
+            $q->isUserWriting = true;
+            $q->save();
+        }
+    }
+
+    public function setNotWriting()
+    {
+        $q = App_Model_Queue::first(array('active = ?' => true));
+        if ($q != null) {
+            $q->isUserWriting = false;
+            $q->save();
+        }
+    }
+
+    public function userIsWriting()
+    {
+        $q = App_Model_Queue::first(array('active = ?' => true));
+        if ($q != null & $q->getIsUserWriting()) {
+            echo 1;
+        } else {
+            echo 2;
+        }
+    }
+
+    public function adminIsWriting()
+    {
+        $q = App_Model_Queue::first(array('active = ?' => true));
+        if ($q != null & $q->getIsAdminWriting()) {
+            echo 1;
+        } else {
+            echo 2;
         }
     }
 

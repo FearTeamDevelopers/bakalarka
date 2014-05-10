@@ -4,7 +4,7 @@ use THCFrame\Model\Model;
 use THCFrame\Security\UserInterface;
 
 /**
- * Description of UserModel
+ * Description of App_Model_User
  *
  * @author Tomy
  */
@@ -22,15 +22,10 @@ class App_Model_User extends Model implements UserInterface
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 80
+     * @type boolean
      * @index
-     * @unique
-     *
-     * @validate required, email, max(80)
-     * @label email address
      */
-    protected $_email;
+    protected $_active;
 
     /**
      * @column
@@ -43,14 +38,6 @@ class App_Model_User extends Model implements UserInterface
      * @label password
      */
     protected $_password;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     */
-    protected $_active;
 
     /**
      * @column
@@ -90,20 +77,6 @@ class App_Model_User extends Model implements UserInterface
      * @readwrite
      * @type datetime
      */
-    protected $_created;
-
-    /**
-     * @column
-     * @readwrite
-     * @type datetime
-     */
-    protected $_modified;
-
-    /**
-     * @column
-     * @readwrite
-     * @type datetime
-     */
     protected $_lastActive;
 
     /**
@@ -113,6 +86,20 @@ class App_Model_User extends Model implements UserInterface
      * @index
      */
     protected $_deleted;
+
+    /**
+     * @column
+     * @readwrite
+     * @type datetime
+     */
+    protected $_created;
+
+    /**
+     * @column
+     * @readwrite
+     * @type datetime
+     */
+    protected $_modified;
 
     /**
      * 
@@ -125,23 +112,9 @@ class App_Model_User extends Model implements UserInterface
         if (empty($this->$raw)) {
             $this->setCreated(date("Y-m-d H:i:s"));
             $this->setActive(true);
+            $this->setDeleted(false);
         }
         $this->setModified(date("Y-m-d H:i:s"));
-    }
-
-    /**
-     * 
-     * @param type $value
-     * @throws \THCFrame\Security\Exception\Role
-     */
-    public function setRole($value)
-    {
-        $role = strtolower(substr($value, 0, 5));
-        if ($role != 'role_') {
-            throw new \THCFrame\Security\Exception\Role(sprintf('Role %s is not valid', $value));
-        } else {
-            $this->_role = $value;
-        }
     }
 
     /**
@@ -167,7 +140,7 @@ class App_Model_User extends Model implements UserInterface
      */
     public function __toString()
     {
-        $str = "Id: {$this->_id} <br/>Email: {$this->_email} <br/> Name: {$this->_firstname} {$this->_lastname}";
+        $str = "Id: {$this->_id} <br/>Name: {$this->_firstname} {$this->_lastname}";
         return $str;
     }
 

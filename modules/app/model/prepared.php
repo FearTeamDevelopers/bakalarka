@@ -3,11 +3,11 @@
 use THCFrame\Model\Model;
 
 /**
- * Description of App_Model_Konverzace
+ * Description of App_Model_Prepared
  *
  * @author Tomy
  */
-class App_Model_Konverzace extends Model
+class App_Model_Prepared extends Model
 {
 
     /**
@@ -17,20 +17,6 @@ class App_Model_Konverzace extends Model
      * @type auto_increment
      */
     protected $_id;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     */
-    protected $_fromUser;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     */
-    protected $_toUser;
 
     /**
      * @column
@@ -57,7 +43,7 @@ class App_Model_Konverzace extends Model
      */
     protected $_modified;
 
-        /**
+    /**
      * 
      */
     public function preSave()
@@ -70,5 +56,5 @@ class App_Model_Konverzace extends Model
         }
         $this->setModified(date("Y-m-d H:i:s"));
     }
-    
+
 }

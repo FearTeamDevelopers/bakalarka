@@ -3,39 +3,57 @@
 //    document.getElementById('chatWrapper').style.display="block";
 //}else document.getElementById('chatWrapper').style.display="none";
 //}
+jQuery.noConflict();
 
-$(document).ready(function() {
+jQuery(document).ready(function() {
+
+    jQuery.post('/checkUser', function(msg) {
+        var c = msg.substr(0, 2);
+        if (c == 'ok') {
+            jQuery('#loginStep').hide();
+            jQuery("#chatStep").show();
+        } else {
+            jQuery('#loginStep').show();
+            jQuery("#chatStep").hide();
+        }
+    });
+    jQuery('#chatTextarea').keydown(function() {
+        jQuery.post('/setWriting');
+        setTimeout(function() {
+            jQuery.post('/setNotWriting');
+        }, 5000);
+    });
 
     /* GLOBAL SCRIPTS */
 
-    $('#hide').click(function() {
-        $('#chatWrapper').show(500);
-        $(this).hide(500);
+    jQuery('#hide').click(function() {
+        jQuery('#chatWrapper').show(500);
+        jQuery(this).hide(500);
     });
 
-    $(".datepicker").datepicker({
+    jQuery(".datepicker").datepicker({
         changeMonth: true,
         changeYear: true,
         dateFormat: "yy-mm-dd",
         firstDay: 1
     });
 
-    $('#inputForm').submit(function(event) {
+    jQuery('#inputForm').submit(function(event) {
 
         var formData = {
-            'chatTextInput': $('#inputForm .chatTextarea').val()
+            'chatTextInput': jQuery('#inputForm #chatTextarea').val()
         };
 
-        $.ajax({
+        jQuery.ajax({
             type: 'POST',
             url: '/submitChat',
             data: formData,
             dataType: 'text'
         }).done(function(data) {
-            $('#inputForm .chatTextarea').text('');
-            $(".chatContent #messageWrapper2").load("/app/index/loadKonversation/")
+            jQuery('#chatTextarea').val('');
+            jQuery(".chatContent #messageWrapper2").load("/loadConversation")
                     .delay(500)
-                    .animate({scrollTop: $('#clearence').offset().top}, 'fast');
+                    .animate({scrollTop: jQuery('#clearence').offset().top}, 'fast');
         }).fail(function(data) {
             //alert(data);
         });
@@ -43,9 +61,19 @@ $(document).ready(function() {
         event.preventDefault();
     });
 
+    jQuery('#loginButton').click(function() {
+        var firstName = jQuery('.login input[name=firstname]').val();
+        var lastName = jQuery('.login input[name=lastname]').val();
 
-    //$(window).load(scrollDown);
-
+        jQuery.post('/login', {firstName: firstName, lastName: lastName}, function(message) {
+            if (message == 'success') {
+                jQuery('#loginStep').hide();
+                jQuery("#chatStep").show();
+            } else {
+                jQuery('#loginStep .errorBox').text(message);
+            }
+        })
+    });
 });
 
 scrollDown = function() {
@@ -53,38 +81,56 @@ scrollDown = function() {
 };
 
 setInterval(function() {
+    jQuery('#loader, .loader').hide();
 
-    $(".chatContent #messageWrapper2")
-            .load("/app/index/loadKonversation/")
-            .load(scrollDown);
+    jQuery.post('/adminIsWriting', function(msg) {
+        var c = msg.substr(0, 1);
+        if (c == 1) {
+            jQuery('#writingIndicator').show();
+        } else {
+            jQuery('#writingIndicator').hide();
+        }
+    });
 
-    var messageInput = $(".chatInputs").is(":visible");
-    
+    jQuery(".chatContent #messageWrapper2")
+            .load("/loadConversation")
+            .animate({scrollTop: jQuery('#clearence').offset().top}, 'fast');
+
+    var messageInput = jQuery(".chatInputs").is(":visible");
+
     if (messageInput == false) {
-        $.post("/app/index/checkStatus/", function(msg) {
+        jQuery.post("/checkStatus", function(msg) {
             if (msg == 1) {
-                location.reload(1);
-
+                //location.reload(1);
+                jQuery(".chatInputs").show();
+                playActiveSound();
             } else {
-                $(".chatInputs").hide();
+                jQuery(".chatInputs").hide();
             }
         });
     } else {
-        $.post("/app/index/checkStatus/", function(msg) {
+        jQuery.post("/checkStatus", function(msg) {
             if (msg == 3) { //konversation inactive
-                $(".chatInputs").hide();
+                jQuery("#chatStep").show();
+                jQuery(".chatInputs").hide();
             } else if (msg == 2) { //user deleted by admin
-                window.location = "/logout";
-                
-                //delete na strane admina a tady pak jen
-                //location.reload(1);
+                jQuery("#chatStep").hide();
+                jQuery('#loginStep').show();
             } else if (msg == 4) { //no user in session - user is not logged
-                window.location = "/login";
-
-                //location.reload(1);
+                jQuery('#loginStep').show();
+                jQuery("#chatStep").hide();
             }
         });
-        
     }
+}, 1000);
 
-}, 5000);
+
+
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+function playActiveSound() {
+    var audio = document.getElementById("activeSound");
+    audio.play();
+}
+
