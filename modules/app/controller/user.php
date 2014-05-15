@@ -9,14 +9,12 @@ use THCFrame\Request\RequestMethods as RequestMethods;
  *
  * @author Tomy
  */
-class App_Controller_User extends Controller
-{
+class App_Controller_User extends Controller {
 
     /**
      * Ajax
      */
-    public function login()
-    {
+    public function login() {
         $this->willRenderLayoutView = false;
         $session = Registry::get('session');
 
@@ -39,15 +37,14 @@ class App_Controller_User extends Controller
             $queue->save();
             echo 'success';
         } else {
-            echo 'Ve jmene nebo prijmeni jsou nepovolene znaky';
+            echo 'Chyba při zadávání údajů';
         }
     }
 
     /**
      * Ajax
      */
-    public function logoutA()
-    {
+    public function logoutA() {
         $session = Registry::get('session');
         $user = $session->get('user');
         $userId = $user->getId();
@@ -64,22 +61,25 @@ class App_Controller_User extends Controller
     /**
      * 
      */
-    public function logout()
-    {
+    public function logout() {
         $session = Registry::get('session');
         $user = $session->get('user');
-        $userId = $user->getId();
+        if ($user != null) {
+            $userId = $user->getId();
 
-        $queue = App_Model_Queue::first(array(
-                    'idUser = ?' => $userId
-        ));
-        $queue->delete();
-        $session->erase('user');
-        $userD = App_Model_User::first(array('id = ?' => $userId));
-        $userD->deleted = true;
-        $userD->save();
+            $queue = App_Model_Queue::first(array(
+                        'idUser = ?' => $userId
+            ));
+            $queue->delete();
+            $session->erase('user');
+            $userD = App_Model_User::first(array('id = ?' => $userId));
+            $userD->deleted = true;
+            $userD->save();
 
-        self::redirect('/');
+            self::redirect('/');
+        } else {
+            self::redirect('/');
+        }
     }
 
 }

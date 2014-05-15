@@ -7,16 +7,14 @@ use THCFrame\Registry\Registry;
 /**
  * Description of IndexController
  *
- * @author Tomy
+ * @author Tomáš Sláma
  */
-class Admin_Controller_Index extends Controller
-{
+class Admin_Controller_Index extends Controller {
 
     /**
      * @before _secured, _admin
      */
-    public function index()
-    {
+    public function index() {
         $view = $this->getActionView();
         $query3 = App_Model_Queue::getQuery(array('tb_queue.*'));
 
@@ -74,8 +72,7 @@ class Admin_Controller_Index extends Controller
      * ajaxem volaná metoda
      */
 
-    public function changeStatus($id)
-    {
+    public function changeStatus($id) {
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
@@ -117,8 +114,7 @@ class Admin_Controller_Index extends Controller
     /**
      * @before _secured, _admin
      */
-    public function submitChat()
-    {
+    public function submitChat() {
         $view = $this->getActionView();
         $user = App_Model_Queue::first(array('active = ?' => true));
         $userId = $user->getIdUser();
@@ -143,8 +139,7 @@ class Admin_Controller_Index extends Controller
      * @before _secured, _admin
      *
      */
-    public function loadChat()
-    {
+    public function loadChat() {
         $this->willRenderLayoutView = false;
 
         $queue = App_Model_Queue::first(array('active = ?' => true));
@@ -176,8 +171,7 @@ class Admin_Controller_Index extends Controller
     /**
      * @before _secured, _admin
      */
-    public function loadQ()
-    {
+    public function loadQ() {
 
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
@@ -211,8 +205,7 @@ class Admin_Controller_Index extends Controller
     /**
      * @before _secured, _admin
      */
-    public function deleteUserFromQ()
-    {
+    public function deleteUserFromQ() {
         $view = $this->getActionView();
 
         $q = App_Model_Queue::first(array(
@@ -234,8 +227,10 @@ class Admin_Controller_Index extends Controller
         }
     }
 
-    public function playSound()
-    {
+    /**
+     * @before _secured, _admin
+     */
+    public function playSound() {
         $session = Registry::get("session");
         $qCountBla = $session->get("qcountbla");
         $qCount = App_Model_User::count(array(
@@ -251,8 +246,10 @@ class Admin_Controller_Index extends Controller
         }
     }
 
-    public function saveConfigData()
-    {
+    /**
+     * @before _secured, _admin
+     */
+    public function saveConfigData() {
         if (RequestMethods::post('submitWelcomeMessage')) {
             $value = App_Model_Options::first(array('nazev = ?' => 'welcomeMessage'));
             $value2 = App_Model_Options::first(array('nazev = ?' => 'chatActive'));
@@ -269,16 +266,17 @@ class Admin_Controller_Index extends Controller
         self::redirect('/admin/');
     }
 
-    public function clearSession()
-    {
+    public function clearSession() {
         if (ENV == 'dev') {
             $session = Registry::get('session');
             $session->erase('user');
         }
     }
 
-    public function setWriting()
-    {
+    /**
+     * @before _secured, _admin
+     */
+    public function setWriting() {
         $q = App_Model_Queue::first(array('active = ?' => true));
         if ($q != null) {
             $q->isAdminWriting = true;
@@ -286,8 +284,10 @@ class Admin_Controller_Index extends Controller
         }
     }
 
-    public function setNotWriting()
-    {
+    /**
+     * @before _secured, _admin
+     */
+    public function setNotWriting() {
         $q = App_Model_Queue::first(array('active = ?' => true));
         if ($q != null) {
             $q->isAdminWriting = false;
@@ -295,8 +295,10 @@ class Admin_Controller_Index extends Controller
         }
     }
 
-    public function userIsWriting()
-    {
+    /**
+     * @before _secured, _admin
+     */
+    public function userIsWriting() {
         $q = App_Model_Queue::first(array('active = ?' => true));
         if ($q != null & $q->getIsUserWriting()) {
             echo 1;
@@ -305,8 +307,10 @@ class Admin_Controller_Index extends Controller
         }
     }
 
-    public function adminIsWriting()
-    {
+    /**
+     * @before _secured, _admin
+     */
+    public function adminIsWriting() {
         $q = App_Model_Queue::first(array('active = ?' => true));
         if ($q != null & $q->getIsAdminWriting()) {
             echo 1;

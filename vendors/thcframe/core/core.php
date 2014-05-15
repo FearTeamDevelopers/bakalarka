@@ -5,8 +5,7 @@ namespace THCFrame\Core;
 use THCFrame\Core\Exception as Exception;
 use THCFrame\Registry\Registry as Registry;
 
-class Core
-{
+class Core {
 
     private static $_errorLog;
     private static $_pathToLogs;
@@ -19,13 +18,11 @@ class Core
         '.'
     );
 
-    private function __construct()
-    {
+    private function __construct() {
         
     }
 
-    private function __clone()
-    {
+    private function __clone() {
         
     }
 
@@ -34,8 +31,7 @@ class Core
      * @param type $array
      * @return type
      */
-    private static function _clean($array)
-    {
+    private static function _clean($array) {
         if (is_array($array)) {
             return array_map(__CLASS__ . '::_clean', $array);
         }
@@ -45,8 +41,7 @@ class Core
     /**
      * 
      */
-    private static function _logCleanUp()
-    {
+    private static function _logCleanUp() {
         $logsPath = self::$_pathToLogs;
         $iterator = new \DirectoryIterator($logsPath);
         $arr = array();
@@ -71,8 +66,7 @@ class Core
      * @return type
      * @throws Exception
      */
-    protected static function _autoload($class)
-    {
+    protected static function _autoload($class) {
         //$paths = explode(PATH_SEPARATOR, get_include_path());
         $flags = PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE;
         $file = strtolower(str_replace('\\', DIRECTORY_SEPARATOR, trim($class, '\\'))) . '.php';
@@ -104,14 +98,35 @@ class Core
      * @param type $message
      * @param type $file
      */
-    public static function log($message, $file = null)
-    {
-        $messageE = '[' . date('Y-m-d H:i:s', time()) . '] DEBUG: ' . $message . PHP_EOL;
+    public static function log($message, $file = null, $profiler = null) {
+        if ($profiler !== null) {
+            $messageE = '[' . date('Y-m-d H:i:s', time()) . '] PROFILER: ' . $message . PHP_EOL;
+        } else {
+            $messageE = '[' . date('Y-m-d H:i:s', time()) . '] DEBUG: ' . $message . PHP_EOL;
+        }
 
         if (NULL !== $file) {
-            file_put_contents(APP_PATH . '/application/logs/' . $file, $messageE, FILE_APPEND);
+            if (strlen($file) > 50) {
+                $file = trim(substr($file, 0, 50));
+            }
+
+            $path = APP_PATH . '/application/logs/' . $file;
+            if (!file_exists($path)) {
+                file_put_contents($path, $messageE);
+            } elseif (file_exists($path) && filesize($path) < 10000000) {
+                file_put_contents($path, $messageE, FILE_APPEND);
+            } elseif (file_exists($path) && filesize($path) > 10000000) {
+                file_put_contents($path, $messageE);
+            }
         } else {
-            file_put_contents(APP_PATH . '/application/logs/system.log', $messageE, FILE_APPEND);
+            $path = APP_PATH . '/application/logs/system.log';
+            if (!file_exists($path)) {
+                file_put_contents($path, $messageE);
+            } elseif (file_exists($path) && filesize($path) < 10000000) {
+                file_put_contents($path, $messageE, FILE_APPEND);
+            } elseif (file_exists($path) && filesize($path) > 10000000) {
+                file_put_contents($path, $messageE);
+            }
         }
     }
 
@@ -120,8 +135,7 @@ class Core
      * @return type
      * @throws Exception
      */
-    public static function initialize()
-    {
+    public static function initialize() {
         if (!defined('APP_PATH')) {
             throw new Exception('APP_PATH not defined');
         }
@@ -157,8 +171,7 @@ class Core
      * 
      * @param type $moduleArray
      */
-    public static function registerModules($moduleArray)
-    {
+    public static function registerModules($moduleArray) {
         foreach ($moduleArray as $moduleName) {
             self::registerModule($moduleName);
         }
@@ -168,8 +181,7 @@ class Core
      * 
      * @throws \THCFrame\Module\Exception\Multiload
      */
-    public static function registerModule($moduleName)
-    {
+    public static function registerModule($moduleName) {
         if (array_key_exists(ucfirst($moduleName), self::$_modules)) {
             throw new \THCFrame\Module\Exception\Multiload(sprintf('Module %s has been alerady loaded', ucfirst($moduleName)));
         } else {
@@ -190,8 +202,7 @@ class Core
      * @param type $moduleName
      * @return null
      */
-    public static function getModule($moduleName)
-    {
+    public static function getModule($moduleName) {
         $moduleName = ucfirst($moduleName);
 
         if (array_key_exists($moduleName, self::$_modules)) {
@@ -205,8 +216,7 @@ class Core
      * 
      * @return type
      */
-    public static function getModules()
-    {
+    public static function getModules() {
         if (count(self::$_modules) < 1) {
             return null;
         } else {
@@ -218,8 +228,7 @@ class Core
      * 
      * @return null
      */
-    public static function getModuleNames()
-    {
+    public static function getModuleNames() {
         if (count(self::$_modules) < 1) {
             return null;
         } else {
@@ -241,8 +250,7 @@ class Core
      * @param type $file
      * @param type $row
      */
-    public static function _errorHandler($number, $text, $file, $row)
-    {
+    public static function _errorHandler($number, $text, $file, $row) {
         switch ($number) {
             case E_WARNING: case E_USER_WARNING :
                 $type = 'Warning';
@@ -259,10 +267,12 @@ class Core
         $time = '[' . strftime('%Y-%m-%d %H:%M:%S', time()) . ']';
         $message = "{$time} ~ {$type} ~ {$file} ~ {$row} ~ {$text}" . PHP_EOL;
 
-        if (file_exists(self::$_errorLog) && filesize(self::$_errorLog) > 10000000) {
+        if (!file_exists(self::$_errorLog)) {
             file_put_contents(self::$_errorLog, $message);
-        } else {
+        } elseif (file_exists(self::$_errorLog) && filesize(self::$_errorLog) < 10000000) {
             file_put_contents(self::$_errorLog, $message, FILE_APPEND);
+        } elseif (file_exists(self::$_errorLog) && filesize(self::$_errorLog) > 10000000) {
+            file_put_contents(self::$_errorLog, $message);
         }
     }
 
@@ -271,8 +281,7 @@ class Core
      * 
      * @param Exception $exception
      */
-    public static function _exceptionHandler(\Exception $exception)
-    {
+    public static function _exceptionHandler(\Exception $exception) {
         $type = get_class($exception);
         $file = $exception->getFile();
         $row = $exception->getLine();
@@ -280,19 +289,21 @@ class Core
         $time = '[' . strftime('%Y-%m-%d %H:%M:%S', time()) . ']';
 
         $message = "{$time} ~ Uncaught exception: {$type} ~ {$file} ~ {$row} ~ {$text}" . PHP_EOL;
+        $message .= $exception->getTraceAsString() . PHP_EOL;
 
-        if (file_exists(self::$_errorLog) && filesize(self::$_errorLog) > 10000000) {
+        if (!file_exists(self::$_errorLog)) {
             file_put_contents(self::$_errorLog, $message);
-        } else {
+        } elseif (file_exists(self::$_errorLog) && filesize(self::$_errorLog) < 10000000) {
             file_put_contents(self::$_errorLog, $message, FILE_APPEND);
+        } elseif (file_exists(self::$_errorLog) && filesize(self::$_errorLog) > 10000000) {
+            file_put_contents(self::$_errorLog, $message);
         }
     }
 
     /**
      * 
      */
-    public static function run()
-    {
+    public static function run() {
         try {
             // configuration
 

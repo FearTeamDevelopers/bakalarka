@@ -7,13 +7,11 @@ use THCFrame\Request\RequestMethods;
 /**
  * Description of IndexController
  *
- * @author Tomy
+ * @author Tomáš
  */
-class App_Controller_Index extends Controller
-{
+class App_Controller_Index extends Controller {
 
-    public function index()
-    {
+    public function index() {
         $view = $this->getActionView();
         $layout = $this->getLayoutView();
 
@@ -39,8 +37,7 @@ class App_Controller_Index extends Controller
     /**
      *  @before _secured
      */
-    public function submitChat()
-    {
+    public function submitChat() {
         $view = $this->getActionView();
 
         $session = Registry::get('session');
@@ -69,8 +66,7 @@ class App_Controller_Index extends Controller
     /**
      *  @before _secured
      */
-    public function loadConversation()
-    {
+    public function loadConversation() {
         $this->willRenderLayoutView = false;
 
         $session = Registry::get('session');
@@ -123,8 +119,7 @@ class App_Controller_Index extends Controller
     /**
      * @before _secured
      */
-    public function checkStatus()
-    {
+    public function checkStatus() {
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
@@ -156,10 +151,9 @@ class App_Controller_Index extends Controller
     }
 
     /**
-     * 
+     *  @before _secured
      */
-    public function checkUser()
-    {
+    public function checkUser() {
         $session = Registry::get('session');
         $user = $session->get('user');
 
@@ -170,8 +164,10 @@ class App_Controller_Index extends Controller
         }
     }
 
-    public function setWriting()
-    {
+    /**
+     *  @before _secured
+     */
+    public function setWriting() {
         $q = App_Model_Queue::first(array('active = ?' => true));
         if ($q != null) {
             $q->isUserWriting = true;
@@ -179,8 +175,10 @@ class App_Controller_Index extends Controller
         }
     }
 
-    public function setNotWriting()
-    {
+    /**
+     *  @before _secured
+     */
+    public function setNotWriting() {
         $q = App_Model_Queue::first(array('active = ?' => true));
         if ($q != null) {
             $q->isUserWriting = false;
@@ -188,8 +186,10 @@ class App_Controller_Index extends Controller
         }
     }
 
-    public function userIsWriting()
-    {
+    /**
+     *  @before _secured
+     */
+    public function userIsWriting() {
         $q = App_Model_Queue::first(array('active = ?' => true));
         if ($q != null & $q->getIsUserWriting()) {
             echo 1;
@@ -198,8 +198,10 @@ class App_Controller_Index extends Controller
         }
     }
 
-    public function adminIsWriting()
-    {
+    /**
+     *  @before _secured
+     */
+    public function adminIsWriting() {
         $q = App_Model_Queue::first(array('active = ?' => true));
         if ($q != null & $q->getIsAdminWriting()) {
             echo 1;

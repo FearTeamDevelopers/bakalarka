@@ -1,8 +1,8 @@
 <?php
 
-define('ENV', 'dev');
+//define('ENV', 'dev');
 //define('ENV', 'qa');
-//define('ENV', 'live');
+define('ENV', 'live');
 
 define("APP_PATH", __DIR__);
 
