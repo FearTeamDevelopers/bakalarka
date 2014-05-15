@@ -1,3 +1,4 @@
+
 body{
     background-color:#f6f5f2;
 }
@@ -400,10 +401,19 @@ textarea {
     line-height: 1.7em;
     padding: 20px 30px;
     overflow:auto;
-    top:12%;
+    top:150px;
 }
 
-
+#logout{
+    top:5%;
+    right:10px;
+    position:absolute;
+}
+#konec{
+    top:5%;
+    right:150px;
+    position:absolute;
+}
 
 
 
